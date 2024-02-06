@@ -26,7 +26,7 @@ const CensusSchema = new mongoose.Schema({
       type: Number,
     },
   },
-});
+})
 
 CensusSchema.set("timestamps", true)
 CensusSchema.set("toJSON", { virtuals: true })
