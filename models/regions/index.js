@@ -10,31 +10,32 @@ const RegionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  levlCode: {
+  levelCode: {
     type: Number,
     required: true,
   },
-  geoLvlName: {
+  geoLevelName: {
     type: String,
     required: true,
   },
-  cntrCode: {
+  parentId: {
+    type: String,
+    required: true
+  },
+  countryCode: {
     type: String,
     required: true,
   },
-
   centroid: {
-    type: {
-      type: String,
-
-    },
-    coordinates: {
-      type: CoordinatePair,
-      required: true
-    },
-    geometry: {
-      type: mongoose.Schema.Types.Mixed
-    }
+    type: String,
+    enum: ["Point"],
+  },
+  coordinates: {
+    type: CoordinatePair,
+    required: true
+  },
+  geometry: {
+    type: mongoose.Schema.Types.Mixed
   }
 })
 

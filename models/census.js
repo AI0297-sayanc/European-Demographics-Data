@@ -9,11 +9,11 @@ const CensusSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  levlCode: {
+  levelCode: {
     type: Number,
     required: true,
   },
-  geoLvlCodeE: {
+  geoLevelCode: {
     type: String,
     required: true,
   },
