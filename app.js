@@ -8,8 +8,6 @@ const helmet = require("helmet")
 
 require("dotenv").config()
 
-const logger = require("./lib/logger")
-
 const restRoutes = require("./routes/rest")
 const webRoutes = require("./routes/web")
 
@@ -29,7 +27,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
-app.use((req, res, next) => { req.logger = logger; return next() })
 
 app.use("/", webRoutes)
 app.use(`/api/v${process.env.API_VERSION}`, restRoutes)

@@ -18,15 +18,13 @@ const CensusSchema = new mongoose.Schema({
     required: true,
   },
   censusAttributes: {
-    Population: String,
-    HH: String,
-    MHI: String,
-    MPV: String,
-    ownedPercentage: {
-      type: Number,
-    },
-  },
-});
+    population: String,
+    households: String,
+    avgHouseholdIncome: String,
+    avgPropertyValue: String,
+    homeOwnershipRate: Number
+  }
+})
 
 CensusSchema.set("timestamps", true)
 CensusSchema.set("toJSON", { virtuals: true })

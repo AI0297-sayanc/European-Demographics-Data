@@ -20,22 +20,26 @@ const RegionSchema = new mongoose.Schema({
   },
   parentId: {
     type: String,
-    required: true
+    required: true,
   },
   countryCode: {
     type: String,
     required: true,
   },
   centroid: {
-    type: String,
-    enum: ["Point"],
-  },
-  coordinates: {
-    type: CoordinatePair,
-    required: true
+    type: {
+      type: String,
+      enum: ["Point"]
+    },
+    coordinates: CoordinatePair,
   },
   geometry: {
-    type: mongoose.Schema.Types.Mixed
+    type: {
+      type: String,
+    },
+    coordinates: {
+      type: mongoose.Schema.Types.Mixed,
+    },
   }
 })
 
