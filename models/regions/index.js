@@ -36,9 +36,10 @@ const RegionSchema = new mongoose.Schema({
   geometry: {
     type: {
       type: String,
+      enum: ["MultiPolygon", "Polygon"]
     },
     coordinates: {
-      type: mongoose.Schema.Types.Mixed,
+      type: mongoose.Schema.Types.Mixed
     },
   }
 })

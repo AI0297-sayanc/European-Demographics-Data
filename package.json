@@ -5,12 +5,8 @@
   "engines": {
     "node": ">=12"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/sayanriju/express-skeleton-2"
-  },
+
   "main": "bin/www",
-  "author": "Sayan \"Riju\" Chakrabarti <s26c.sayan@gmail.com>",
   "license": "MIT",
   "scripts": {
     "start": "npm run serve:dev",
@@ -34,7 +30,6 @@
     "cors": "^2.8.5",
     "debug": "^4.1.1",
     "dotenv": "^6.2.0",
-    "ejs": "^3.1.8",
     "email-templates": "^10.0.1",
     "express": "^4.17.1",
     "express-jwt": "^8.2.1",
@@ -47,7 +42,6 @@
     "mongodb-memory-server": "^8.9",
     "mongoose": "^6.8.2",
     "morgan": "^1.9.1",
-    "multer": "^1.4.5-lts.1",
     "node-mocks-http": "^1.9.0",
     "pino": "^8.8.0",
     "pino-loki": "^2.1.3",
