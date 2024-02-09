@@ -22,6 +22,7 @@ const RegionSchema = new mongoose.Schema({
   },
   parentId: {
     type: Number
+    required: true
   },
   countryCode: {
     type: String,
