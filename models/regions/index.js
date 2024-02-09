@@ -1,5 +1,5 @@
 const mongoose = require("mongoose")
-// const mongoosePaginate = require("mongoose-paginate-v2")
+
 const CoordinatePair = require("../schemas/coordinate-pair.class")
 mongoose.Schema.Types.CoordinatePair = CoordinatePair
 
@@ -21,8 +21,8 @@ const RegionSchema = new mongoose.Schema({
     required: true,
   },
   parentId: {
-    type: Number
-    required: true
+    type: String,
+    default: null
   },
   countryCode: {
     type: String,
@@ -44,7 +44,9 @@ const RegionSchema = new mongoose.Schema({
       enum: ["MultiPolygon", "Polygon"],
       required: true
     },
-    coordinates: mongoose.Schema.Types.Mixed
+    coordinates: {
+      type: mongoose.Schema.Types.Mixed
+    }
   }
 })
 

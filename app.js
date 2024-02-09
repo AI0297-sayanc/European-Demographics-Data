@@ -19,10 +19,6 @@ if (process.env.NODE_ENV !== undefined && process.env.NODE_ENV !== "development"
 }
 app.use(cors())
 
-// view engine setup
-app.set("views", path.join(__dirname, "views"))
-app.set("view engine", "ejs")
-
 app.use(morgan("dev"))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -40,6 +36,7 @@ app.use((req, res, next) => {
 // error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
+  logger.error(err)
   res.status(err.status || 500).json({ error: true, message: err.message })
 })
 
