@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.0",
-    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
@@ -41,6 +40,7 @@
     "moment": "^2.27.0",
     "mongodb-memory-server": "^8.9",
     "mongoose": "^6.8.2",
+    "mongoose-paginate-v2": "^1.8.0",
     "morgan": "^1.9.1",
     "node-mocks-http": "^1.9.0",
     "pino": "^8.8.0",

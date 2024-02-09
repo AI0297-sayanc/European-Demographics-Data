@@ -11,6 +11,7 @@ require("dotenv").config()
 const logger = require("./lib/logger")
 
 const restRoutes = require("./routes/rest")
+
 const app = express()
 
 if (process.env.NODE_ENV !== undefined && process.env.NODE_ENV !== "development") {

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
-const CoordinatePair = require("./coordinate-pair.class")
+
+const CoordinatePair = require("../schemas/coordinate-pair.class")
 mongoose.Schema.Types.CoordinatePair = CoordinatePair
 
 const RegionSchema = new mongoose.Schema({
@@ -21,7 +22,7 @@ const RegionSchema = new mongoose.Schema({
   },
   parentId: {
     type: String,
-    required: true,
+    default: null
   },
   countryCode: {
     type: String,
@@ -30,26 +31,28 @@ const RegionSchema = new mongoose.Schema({
   centroid: {
     type: {
       type: String,
-      enum: ["Point"]
+      enum: ["Point"],
+      required: true
     },
     coordinates: {
       type: CoordinatePair
-    },
-    // coordinates: CoordinatePair,
+    }
   },
   geometry: {
     type: {
       type: String,
-      enum: ["MultiPolygon", "Polygon"]
+      enum: ["MultiPolygon", "Polygon"],
+      required: true
     },
     coordinates: {
       type: mongoose.Schema.Types.Mixed
-    },
+    }
   }
 })
 
 RegionSchema.set("timestamps", true)
 RegionSchema.set("toJSON", { virtuals: true })
 RegionSchema.set("toObject", { virtuals: true })
+// RegionSchema.plugin(mongoosePaginate)
 
 module.exports = mongoose.model("Region", RegionSchema)
