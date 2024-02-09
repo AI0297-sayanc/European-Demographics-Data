@@ -67,7 +67,6 @@ typings/
 .vscode/
 tempCodeRunnerFile.javascript
 
-# public/docs/*
-# ^public/docs/.gitkeep
+
 !public/.gitkeep
 

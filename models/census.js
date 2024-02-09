@@ -22,7 +22,7 @@ const CensusSchema = new mongoose.Schema({
     households: String,
     avgHouseholdIncome: String,
     avgPropertyValue: String,
-    homeOwnershipRate: Number
+    homeOwnershipRate: String
   }
 })
 
