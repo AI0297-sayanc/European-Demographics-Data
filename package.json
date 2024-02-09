@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "A starter template for Express JS apps, with sane defaults",
   "engines": {
-    "node": ">=12"
+    "node": ">=20"
   },
 
   "main": "bin/www",

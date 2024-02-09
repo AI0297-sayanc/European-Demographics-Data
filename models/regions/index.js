@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const CoordinatePair = require("./coordinate-pair.class")
+mongoose.Schema.Types.CoordinatePair = CoordinatePair
 
 const RegionSchema = new mongoose.Schema({
   nutsId: {
@@ -31,7 +32,10 @@ const RegionSchema = new mongoose.Schema({
       type: String,
       enum: ["Point"]
     },
-    coordinates: CoordinatePair,
+    coordinates: {
+      type: CoordinatePair
+    },
+    // coordinates: CoordinatePair,
   },
   geometry: {
     type: {

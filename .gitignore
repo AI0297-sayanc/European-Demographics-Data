@@ -68,4 +68,6 @@ typings/
 tempCodeRunnerFile.javascript
 
 public/docs/*
-^public/docs/.gitkeep
+# ^public/docs/.gitkeep
+!public/docs/.gitkeep
+

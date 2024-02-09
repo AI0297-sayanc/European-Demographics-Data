@@ -90,7 +90,7 @@ function onListening() {
  */
 async function main() {
   try {
-    // logger.info("Connected to Mongo DB via Mongoose 💪")
+    logger.info("Connected to Mongo DB via Mongoose 💪")
   } catch (dbConnErr) {
     logger.error(`➡️ Failed to connect to Mongo DB via Mongoose: ${dbConnErr.message}`)
   } finally {
