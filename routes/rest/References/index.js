@@ -1,4 +1,4 @@
-const Reference = require("../../../models/references")
+const Reference = require("../../../models/reference")
 
 module.exports = {
   async(req, res) {
