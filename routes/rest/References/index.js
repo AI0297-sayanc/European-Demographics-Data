@@ -1,10 +1,11 @@
 const Reference = require("../../../models/reference")
+const Level = require("../../../models/level")
 
 module.exports = {
   /**
- * @api {get} /api/reference/attributes Retrieve Reference Attributes
+ * @api {get} /references/attributes Retrieve Reference Attributes
  * @apiName Retrieve Reference Attributes
- * @apiGroup Reference
+ * @apiGroup References
  * @apiVersion 1.0.0
  *
  * @apiParam {String} [name] Filter attributes by name.
@@ -76,6 +77,50 @@ module.exports = {
     } catch (error) {
       return res.status(500).json({ error: true, message: error.message })
     }
-  }
+  },
 
+  /**
+     * @api {get} /references/levels Retrieve Levels by Country Code
+     * @apiName Retrieve Levels by Country Code
+     * @apiGroup References
+     * @apiVersion 1.0.0
+     *
+     * @apiParam {String} countryCode Filter levels by country code.
+     *
+     * @apiSuccessExample {json} Success-Response: 200
+     * {
+     *   "error": false,
+     *   "levels": [
+     *     {
+     *       "_id": "65c9fafa7c9694b5773cef5b",
+     *       "levelCode": 1,
+     *       "levelName": "Regions",
+     *       "countryCode": "IT",
+     *       "countryName": "Italy"
+     *     }
+     *   ]
+     * }
+     */
+  async levelsByCountryCode(req, res) {
+    const { countryCode } = req.query
+
+    try {
+      if (countryCode === undefined) {
+        return res.status(400).json({ error: true, message: "Country code is required!!!" })
+      }
+
+      // Convert to uppercase
+      const uppercaseCountryCode = countryCode.toUpperCase()
+
+      const isValidCountryCode = await Level.exists({ countryCode: uppercaseCountryCode })
+
+      if (isValidCountryCode) {
+        const levels = await Level.find({ countryCode: uppercaseCountryCode }).lean().exec()
+        return res.status(200).json({ error: false, levels })
+      }
+      return res.status(400).json({ error: true, message: "Please enter a valid country code" })
+    } catch (error) {
+      return res.status(400).json({ error: true, message: error.message })
+    }
+  }
 }
