@@ -67,7 +67,7 @@ module.exports = {
 
       return res.status(200).json({
         error: false,
-        attribute: docs,
+        attributes: docs,
         totalData: totalDocs,
         totalPages,
         page: Number(page),

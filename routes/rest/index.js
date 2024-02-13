@@ -11,5 +11,4 @@ const Reference = require("./References")
 // route for References
 router.get("/references/attributes", Reference.attributes)
 
-
 module.exports = router
