@@ -17,9 +17,6 @@
     "lint:quiet": "eslint --quiet './**/*.js'",
     "lint:all": "eslint './**/*.js'",
     "lint:fix": "eslint './**/*.js' --quiet --fix",
-    "test:nocoverage": "ava",
-    "test:withcoverage": "nyc ava",
-    "test": "npm run test:withcoverage",
     "gendoc": "apidoc -i routes/ -o public/docs"
   },
   "dependencies": {

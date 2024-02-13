@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-
+const mongoose = require("mongoose")
 const debug = require("debug")("skeleton:server")
 const http = require("http")
 const app = require("../app")
@@ -90,6 +90,9 @@ function onListening() {
  */
 async function main() {
   try {
+    mongoose.Promise = global.Promise
+    mongoose.set("strictQuery", false)
+    await mongoose.connect(process.env.MONGODB_CONNECTION_STRING)
     logger.info("Connected to Mongo DB via Mongoose 💪")
   } catch (dbConnErr) {
     logger.error(`➡️ Failed to connect to Mongo DB via Mongoose: ${dbConnErr.message}`)
