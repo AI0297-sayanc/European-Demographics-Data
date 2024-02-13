@@ -40,7 +40,6 @@ const ReferenceSchema = new mongoose.Schema({
     type: String,
     default: null,
   }
-
 })
 
 ReferenceSchema.set("timestamps", true)

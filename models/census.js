@@ -19,7 +19,6 @@ const CensusSchema = new mongoose.Schema({
   },
   censusAttributes: {
     type: mongoose.Schema.Types.Mixed
-
   }
 })
 
