@@ -80,29 +80,43 @@ module.exports = {
   },
 
   /**
-     * @api {get} /references/levels Retrieve Levels by Country Code
-     * @apiName Retrieve Levels by Country Code
-     * @apiGroup References
-     * @apiVersion 1.0.0
-     *
-     * @apiParam {String} countryCode Filter levels by country code.
-     *
-     * @apiSuccessExample {json} Success-Response: 200
-     * {
-     *   "error": false,
-     *   "levels": [
-     *     {
-     *       "_id": "65c9fafa7c9694b5773cef5b",
-     *       "levelCode": 1,
-     *       "levelName": "Regions",
-     *       "countryCode": "IT",
-     *       "countryName": "Italy"
-     *     }
-     *   ]
-     * }
-     */
+ * @api {get} /references/levels/:countryCode Retrieve Levels by Country Code
+ * @apiName Retrieve Levels by Country Code
+ * @apiGroup References
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {String} countryCode Path parameter for filtering levels by country code.
+ *
+ * @apiSuccessExample {json} Success-Response: 200
+ {
+    "error": false,
+    "levels": [
+        {
+            "_id": "65c9fafa7c9694b5773cef5b",
+            "levelCode": 1,
+            "levelName": "Regions",
+            "countryCode": "IT",
+            "countryName": "Italy"
+        },
+        {
+            "_id": "65c9fafa7c9694b5773cef5c",
+            "levelCode": 2,
+            "levelName": "Provinces",
+            "countryCode": "IT",
+            "countryName": "Italy"
+        },
+        {
+            "_id": "65c9fafa7c9694b5773cef5d",
+            "levelCode": 3,
+            "levelName": "Municipality",
+            "countryCode": "IT",
+            "countryName": "Italy"
+        }
+    ]
+}
+ */
   async levelsByCountryCode(req, res) {
-    const { countryCode } = req.query
+    const { countryCode } = req.params
 
     try {
       if (countryCode === undefined) {
@@ -110,12 +124,15 @@ module.exports = {
       }
 
       // Convert to uppercase
-      const uppercaseCountryCode = countryCode.toUpperCase()
+      const uppercaseCountryCode = await countryCode.toUpperCase()
 
       const isValidCountryCode = await Level.exists({ countryCode: uppercaseCountryCode })
 
       if (isValidCountryCode) {
-        const levels = await Level.find({ countryCode: uppercaseCountryCode }).lean().exec()
+        const levels = await Level.find({ countryCode: uppercaseCountryCode })
+          .sort({ levelCode: 1 })
+          .lean()
+          .exec()
         return res.status(200).json({ error: false, levels })
       }
       return res.status(400).json({ error: true, message: "Please enter a valid country code" })
