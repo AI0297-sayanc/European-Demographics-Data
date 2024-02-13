@@ -18,11 +18,7 @@ const CensusSchema = new mongoose.Schema({
     required: true,
   },
   censusAttributes: {
-    population: String,
-    households: String,
-    avgHouseholdIncome: String,
-    avgPropertyValue: String,
-    homeOwnershipRate: String
+    type: mongoose.Schema.Types.Mixed
   }
 })
 
