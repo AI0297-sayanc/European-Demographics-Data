@@ -167,16 +167,12 @@ module.exports = {
       // Convert to uppercase
       const uppercaseCountryCode = await countryCode.toUpperCase()
 
-      const isValidCountryCode = await Level.exists({ countryCode: uppercaseCountryCode })
-
-      if (isValidCountryCode) {
-        const levels = await Level.find({ countryCode: uppercaseCountryCode })
-          .sort({ levelCode: 1 })
-          .lean()
-          .exec()
-        return res.status(200).json({ error: false, levels })
-      }
-      return res.status(400).json({ error: true, message: "Please enter a valid country code" })
+      const levels = await Level.find({ countryCode: uppercaseCountryCode })
+        .sort({ levelCode: 1 })
+        .lean()
+        .exec()
+      if (levels.length === 0) return res.status(400).json({ error: true, message: "Please enter a valid country code" })
+      return res.status(200).json({ error: false, levels })
     } catch (error) {
       return res.status(400).json({ error: true, message: error.message })
     }
