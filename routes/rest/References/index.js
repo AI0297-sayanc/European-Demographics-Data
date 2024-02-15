@@ -3,9 +3,9 @@ const Level = require("../../../models/level")
 
 module.exports = {
   /**
- * @api {get} /api/reference/attributes Retrieve Reference Attributes
+ * @api {get} /references/attributes Retrieve Reference Attributes
  * @apiName Retrieve Reference Attributes
- * @apiGroup Reference
+ * @apiGroup References
  * @apiVersion 1.0.0
  *
  * @apiParam {String} [name] Filter attributes by name.
@@ -68,7 +68,7 @@ module.exports = {
 
       return res.status(200).json({
         error: false,
-        attribute: docs,
+        attributes: docs,
         totalData: totalDocs,
         totalPages,
         page: Number(page),
@@ -78,7 +78,29 @@ module.exports = {
       return res.status(500).json({ error: true, message: error.message })
     }
   },
-
+  /**
+ * @api {get} /countries Retrieve Countries with countrycode and countryname
+ * @apiName Retrieve Countries
+ * @apiGroup References
+ * @apiVersion 1.0.0
+ * @apiParam {Number} [page=1] Page number for pagination. Default: 1.
+ * @apiParam {Number} [size=10] Number of items per page. Default: 10.
+ *
+* @apiSuccessExample {json} Success-Response:200
+    {
+    "error": false,
+    "countries": [
+        {
+            "countryCode": "AT",
+            "countryName": "Austria"
+        }
+    ],
+    "totalData": 25,
+    "totalPages": 25,
+    "page": 1,
+    "size": 1
+}
+*/
   async countries(req, res) {
     const { page = 1, size = 10 } = req.query
     try {
@@ -118,6 +140,63 @@ module.exports = {
     } catch (err) {
       return res.status(500).json({ error: true, message: err.message })
     }
-  }
+  },
 
+  /**
+ * @api {get} /references/levels/:countryCode Retrieve Levels by Country Code
+ * @apiName Retrieve Levels by Country Code
+ * @apiGroup References
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {String} countryCode Path parameter for filtering levels by country code.
+ *
+ * @apiSuccessExample {json} Success-Response: 200
+ {
+    "error": false,
+    "levels": [
+        {
+            "_id": "65c9fafa7c9694b5773cef5b",
+            "levelCode": 1,
+            "levelName": "Regions",
+            "countryCode": "IT",
+            "countryName": "Italy"
+        },
+        {
+            "_id": "65c9fafa7c9694b5773cef5c",
+            "levelCode": 2,
+            "levelName": "Provinces",
+            "countryCode": "IT",
+            "countryName": "Italy"
+        },
+        {
+            "_id": "65c9fafa7c9694b5773cef5d",
+            "levelCode": 3,
+            "levelName": "Municipality",
+            "countryCode": "IT",
+            "countryName": "Italy"
+        }
+    ]
+}
+ */
+  async levelsByCountryCode(req, res) {
+    const { countryCode } = req.params
+
+    try {
+      if (countryCode === undefined) {
+        return res.status(400).json({ error: true, message: "Country code is required!!!" })
+      }
+
+      // Convert to uppercase
+      const uppercaseCountryCode = await countryCode.toUpperCase()
+
+      const levels = await Level.find({ countryCode: uppercaseCountryCode })
+        .sort({ levelCode: 1 })
+        .lean()
+        .exec()
+      if (levels.length === 0) return res.status(400).json({ error: true, message: "Please enter a valid country code" })
+      return res.status(200).json({ error: false, levels })
+    } catch (error) {
+      return res.status(400).json({ error: true, message: error.message })
+    }
+  }
 }

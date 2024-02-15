@@ -10,6 +10,7 @@ const Reference = require("./References")
 
 // route for References
 router.get("/references/attributes", Reference.attributes)
+router.get("/references/levels/:countryCode", Reference.levelsByCountryCode)
 router.get("/references/countries", Reference.countries)
 
 module.exports = router
