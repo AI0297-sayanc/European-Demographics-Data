@@ -79,6 +79,47 @@ module.exports = {
     }
   },
 
+  async countries(req, res) {
+    const { page = 1, size = 10 } = req.query
+    try {
+      const pipeline = [
+        {
+          $group: {
+            _id: { countryCode: "$countryCode", countryName: "$countryName" }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            countryCode: "$_id.countryCode",
+            countryName: "$_id.countryName"
+          }
+        },
+        {
+          $sort: { countryCode: 1 }
+        }
+      ]
+
+      const distinctCountries = await Level.aggregate(pipeline)
+
+      const startIndex = (page - 1) * size
+      const endIndex = page * size
+
+      const paginatedCountries = distinctCountries.slice(startIndex, endIndex)
+
+      return res.status(200).json({
+        error: false,
+        countries: paginatedCountries,
+        totalData: distinctCountries.length,
+        totalPages: Math.ceil(distinctCountries.length / size),
+        page: Number(page),
+        size: Number(size)
+      })
+    } catch (err) {
+      return res.status(500).json({ error: true, message: err.message })
+    }
+  },
+
   /**
  * @api {get} /references/levels/:countryCode Retrieve Levels by Country Code
  * @apiName Retrieve Levels by Country Code
