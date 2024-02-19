@@ -9,7 +9,7 @@ const regionSearchRadius = require("./Regions Search")
 // router.post("/test", test.test)
 
 // Regions Search routes....
-router.post("/regionssearch/byradius", regionSearchRadius.byRadius)
+router.post("/regionssearch/radius", regionSearchRadius.byRadius)
 // route for References
 router.get("/references/attributes", Reference.attributes)
 router.get("/references/levels/:countryCode", Reference.levelsByCountryCode)
