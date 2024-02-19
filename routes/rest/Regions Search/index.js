@@ -5,7 +5,7 @@ const radiusConvert = require("../../../lib/radiusConvert")
    *
    * @api {post} /regionsearch/radius Search By radius
    * @apiName Byradius
-   * @apiGroup Demographics Data
+   * @apiGroup Region Search
    * @apiVersion  1.0.0
    * @apiHeader {String} Authorization The API-key"
    *
