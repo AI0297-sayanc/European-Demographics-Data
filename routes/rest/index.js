@@ -4,16 +4,13 @@ const { authMiddleware } = require("../../middlewares")
 
 const Reference = require("./References")
 const regionSearchRadius = require("./RegionsSearch")
-const demographicDataRadius = require("./DemographicData")
-// const test = require("./test")
-
-// router.post("/test", test.test)
-
-// Demographic Data routes...
-router.post("/demographics/radius", demographicDataRadius.byRadius)
+const DemographicsData = require("./DemographicsData")
 
 // Regions Search routes....
 router.post("/search/radius", regionSearchRadius.byRadius)
+
+// DemographicsData routes................
+router.use("/demographics", DemographicsData)
 
 // route for References
 router.get("/references/attributes", Reference.attributes)
