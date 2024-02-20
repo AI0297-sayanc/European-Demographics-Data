@@ -15,6 +15,9 @@ router.use("/demographics", DemographicsData)
 // Regions Search routes....
 router.post("/search/radius", RegionSearchRadius.byRadius)
 
+// DemographicsData routes................
+router.use("/demographics", DemographicsData)
+
 // route for References
 router.get("/references/attributes", Reference.attributes)
 router.get("/references/levels/:countryCode", Reference.levelsByCountryCode)
