@@ -3,8 +3,8 @@ const router = express.Router()
 const { authMiddleware } = require("../../middlewares")
 
 const Reference = require("./References")
-const regionSearchRadius = require("./Regions Search")
-const demographicDataRadius = require("./Demographic Data")
+const regionSearchRadius = require("./RegionsSearch")
+const demographicDataRadius = require("./DemographicData")
 // const test = require("./test")
 
 // router.post("/test", test.test)
