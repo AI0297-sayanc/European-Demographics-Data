@@ -14,21 +14,31 @@ test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
 test.serial("Validating Response Schema", async (t) => {
-  const countryCode = "AT"
   const schema = Joi.object({
     error: Joi.boolean().required(),
-    levels: Joi.array().items(
+    censusData: Joi.array().items(
       Joi.object({
-        _id: Joi.string().required(),
-        levelCode: Joi.number().integer().required(),
-        levelName: Joi.string().required(),
-        countryCode: Joi.string().required(),
-        countryName: Joi.string().required()
+        name: Joi.string().required(),
+        value: Joi.number().integer().required(),
+        attribute: Joi.string().required(),
+        description: Joi.string().required()
       })
     ).required()
   })
 
-  const response = await request(app).get(`/api/v1/references/levels/${countryCode}`).set("Accept", "application/json")
+  const requestBody = {
+    nutsIds: ["DK03", "DK04", "DK05", "AT06"],
+    countryCode: "DK",
+    levelCode: 1,
+    censusAttributes: ["EU_E001", "EU_E002", "EU_E003", "EU_E004", "EU_E005"]
+  }
+
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send(requestBody)
+
+  t.is(response.status, 200, `Expected 200 OK, but got ${response.status}`)
 
   const { error } = schema.validate(response.body, { abortEarly: false })
   t.is(error === undefined, true, error?.message)

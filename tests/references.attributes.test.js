@@ -22,7 +22,7 @@ test.after.always(teardownMongo)
 test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
-test.serial("GET /references/attributes/", async (t) => {
+test.serial("Validating Response Schema", async (t) => {
   const schema = Joi.object({
     error: Joi.boolean().required(),
     attributes: Joi.array().items(

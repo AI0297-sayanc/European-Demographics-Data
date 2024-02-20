@@ -13,7 +13,7 @@ test.after.always(teardownMongo)
 test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
-test.serial("GET /references/countries", async (t) => {
+test.serial("Validating Response Schema", async (t) => {
   const schema = Joi.object({
     error: Joi.boolean().required(),
     countries: Joi.array().items(
