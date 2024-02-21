@@ -25,19 +25,33 @@ module.exports = {
   *   ]
   *
 }
- *  */
+  */
   async byNutsId(req, res) {
     try {
-      const { nutsIds, censusAttributes } = req.body
+      const {
+        nutsIds, censusAttributes, countryCode = null, levelCode = null
+      } = req.body
 
       const query = {}
 
+      // validation start....
       if (!Array.isArray(nutsIds) || nutsIds.length === 0) {
         return res.status(400).json({ error: true, message: "nutsIds must be an array and should not be empty" })
       }
 
       if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
         return res.status(400).json({ error: true, message: "censusAttributes must be an array and should not be empty" })
+      }
+
+      if (countryCode !== null) {
+        if (typeof countryCode !== "string" || countryCode.trim() === "") return res.status(400).json({ error: true, message: "Field 'countryCode' must be a valid string" })
+        query.countryCode = countryCode
+      }
+
+      if (levelCode !== null) {
+        // eslint-disable-next-line no-restricted-globals
+        if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number" })
+        query.levelCode = levelCode
       }
 
       query.nutsId = { $in: nutsIds }
