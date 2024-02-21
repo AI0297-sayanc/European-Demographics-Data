@@ -50,3 +50,75 @@ test.serial("Validating Response Schema", async (t) => {
   const { error } = schema.validate(response.body, { abortEarly: false })
   t.is(error === undefined, true, error?.message)
 })
+
+test.serial("If nutsId is null, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: null })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is undefined, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: undefined })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is empty, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: "" })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is NaN, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: NaN })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is 0, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: 0 })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is false, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: false })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is number, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: 22 })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is array, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: ["DK03"] })
+  t.is(response.status, 400)
+})
+
+test.serial("If nutsId is object, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/radius")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, nutsId: { key: "DK03" } })
+  t.is(response.status, 400)
+})
