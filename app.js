@@ -26,7 +26,7 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, "public")))
 app.use((req, res, next) => { req.logger = logger; return next() })
 
-app.use(`/api/v${process.env.API_VERSION}`, restRoutes)
+app.use(`/api/v${process.env.API_VERSION || 1}`, restRoutes)
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
