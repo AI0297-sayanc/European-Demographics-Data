@@ -38,6 +38,8 @@ test.serial("Validating Response Schema", async (t) => {
     .set("Accept", "application/json")
     .send(requestBody)
 
+  // console.log("response.body ==> ", response.body)
+
   t.is(response.status, 200)
 
   const { error } = schema.validate(response.body, { abortEarly: false })
@@ -116,125 +118,110 @@ test.serial("If nutsIds is object, expecting 400", async (t) => {
   t.is(response.status, 400)
 })
 
-// test.serial("If countryCode is null, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: null })
-//   t.is(response.status, 400)
-// })
+test.serial("If countryCode is null, expecting 200", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, countryCode: null })
+  t.is(response.status, 200)
+})
 
-// test.serial("If countryCode is undefined, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: undefined })
-//   t.is(response.status, 400)
-// })
+test.serial("If countryCode is undefined, expecting 200", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, countryCode: undefined })
+  t.is(response.status, 200)
+})
 
-// test.serial("If countryCode is empty, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: "" })
-//   t.is(response.status, 400)
-// })
+test.serial("If countryCode is empty, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, countryCode: "" })
+  t.is(response.status, 400)
+})
 
-// test.serial("If countryCode is NaN, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: NaN })
-//   t.is(response.status, 400)
-// })
+test.serial("If countryCode is false, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, countryCode: false })
+  t.is(response.status, 400)
+})
 
-// test.serial("If countryCode is false, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: false })
-//   t.is(response.status, 400)
-// })
+test.serial("If countryCode is array, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, countryCode: ["10"] })
+  t.is(response.status, 400)
+})
 
-// test.serial("If countryCode is array, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: ["10"] })
-//   t.is(response.status, 400)
-// })
+test.serial("If countryCode is object, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, countryCode: { key: "10" } })
+  t.is(response.status, 400)
+})
 
-// test.serial("If countryCode is object, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, countryCode: { key: "10" } })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is null, expecting 200", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: null })
+  t.is(response.status, 200)
+})
 
-// test.serial("If levelCodes is null, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: null })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is undefined, expecting 200", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: undefined })
+  t.is(response.status, 200)
+})
 
-// test.serial("If levelCodes is undefined, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: undefined })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is empty, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: "" })
+  t.is(response.status, 400)
+})
 
-// test.serial("If levelCodes is empty, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: "" })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is string, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: "1" })
+  t.is(response.status, 400)
+})
 
-// test.serial("If levelCodes is NaN, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: NaN })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is 0, expecting 200, but empty results", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: 0 })
+  t.is(response.status, 200)
+  t.deepEqual(response.body.censusData, [])
+})
 
-// test.serial("If levelCodes is 0, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: 0 })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is false, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: false })
+  t.is(response.status, 400)
+})
 
-// test.serial("If levelCodes is false, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: false })
-//   t.is(response.status, 400)
-// })
-
-// test.serial("If levelCodes is number, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: 22 })
-//   t.is(response.status, 400)
-// })
-
-// test.serial("If levelCodes is object, expecting 400", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/nutsids")
-//     .set("Accept", "application/json")
-//     .send({ ...requestBody, levelCodes: { key: "DK03" } })
-//   t.is(response.status, 400)
-// })
+test.serial("If levelCode is object, expecting 400", async (t) => {
+  const response = await request(app)
+    .post("/api/v1/demographics/nutsids")
+    .set("Accept", "application/json")
+    .send({ ...requestBody, levelCode: { key: "DK03" } })
+  t.is(response.status, 400)
+})
 
 test.serial("If censusAttributes is null, expecting 400", async (t) => {
   const response = await request(app)
