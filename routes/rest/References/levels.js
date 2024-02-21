@@ -47,7 +47,7 @@ module.exports = {
       }
 
       // Convert to uppercase
-      const uppercaseCountryCode = await countryCode.toUpperCase()
+      const uppercaseCountryCode = countryCode.toUpperCase()
 
       const levels = await Level.find({ countryCode: uppercaseCountryCode })
         .sort({ levelCode: 1 })
