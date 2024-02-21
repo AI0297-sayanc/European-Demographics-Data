@@ -68,8 +68,9 @@ module.exports = {
             $maxDistance: Number(radiusConvert.miles2meters(radius)), // convert input radius in miles to meters
           },
         },
-        ...({ levelCode: { $in: levelCodes } })
       }
+      if (levelCodes.length > 0) query.levelCode = { $in: levelCodes }
+
       const regions = await Region.find(query)
         .select("-_id -centroid -geometry")
         .lean()
