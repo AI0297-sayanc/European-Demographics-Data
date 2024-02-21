@@ -13,6 +13,20 @@ test.after.always(teardownMongo)
 test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
+const requestBody = {
+  nutsId: "DK03",
+  radius: 50,
+  countryCode: "DK",
+  levelCode: 1,
+  censusAttributes: [
+    "EU_E001",
+    "EU_E002",
+    "EU_E003",
+    "EU_E004",
+    "EU_E005"
+  ]
+}
+
 test.serial("Validating Response Schema", async (t) => {
   const schema = Joi.object({
     error: Joi.boolean().required(),
@@ -25,20 +39,6 @@ test.serial("Validating Response Schema", async (t) => {
       })
     ).required()
   })
-
-  const requestBody = {
-    nutsId: "DK03",
-    radius: 50,
-    countryCode: "DK",
-    levelCode: 1,
-    censusAttributes: [
-      "EU_E001",
-      "EU_E002",
-      "EU_E003",
-      "EU_E004",
-      "EU_E005"
-    ]
-  }
 
   const response = await request(app)
     .post("/api/v1/demographics/radius")
