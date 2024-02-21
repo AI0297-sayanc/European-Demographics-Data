@@ -32,11 +32,12 @@ module.exports = {
 
       const query = {}
 
-      if (!Array.isArray(nutsIds)) {
-        return res.status(400).json({ error: true, message: "nutsIds must be an array" })
+      if (!Array.isArray(nutsIds) || nutsIds.length === 0) {
+        return res.status(400).json({ error: true, message: "nutsIds must be an array and should not be empty" })
       }
-      if (!Array.isArray(censusAttributes)) {
-        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
+
+      if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
+        return res.status(400).json({ error: true, message: "censusAttributes must be an array and should not be empty" })
       }
 
       query.nutsId = { $in: nutsIds }
