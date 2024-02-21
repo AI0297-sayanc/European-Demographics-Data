@@ -11,8 +11,7 @@ module.exports = {
  *
  * @apiParam {Array} nutsIds Array of NUTS IDs for filtering.
  * @apiParam {Array} censusAttributes Array of census attributes.
- *   @apiSuccessExample { json
-   Success-Response: 200
+ * @apiSuccessExample { json Success-Response: 200
   *     {
   *       "error": false,
   *       "censusData": [
@@ -33,15 +32,14 @@ module.exports = {
 
       const query = {}
 
-      // for nutsid
-      if (nutsIds && Array.isArray(nutsIds)) {
-        query.nutsId = { $in: nutsIds }
-      } else {
+      if (!Array.isArray(nutsIds)) {
         return res.status(400).json({ error: true, message: "nutsIds must be an array" })
       }
       if (!Array.isArray(censusAttributes)) {
         return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
       }
+
+      query.nutsId = { $in: nutsIds }
 
       const pipeline = [
         {
@@ -52,21 +50,14 @@ module.exports = {
         {
           $project: {
             _id: 0,
-            // nutsId: "$nutsId",
-            // name: "$name",
-            // levelCode: "$levelcode",
-            // geoLevelName: 1,
-            // countryCode: 1,
-            ...censusAttributes.reduce((acc, attr) => {
-              acc[attr] = `$censusAttributes.${attr}`
-              return acc
-            }, {})
+
+            ...censusAttributes.reduce((acc, attr) => ({ ...acc, [attr]: `$censusAttributes.${attr}` }), {})
           }
         },
         {
           $group: {
             _id: null,
-            ...censusAttributes.reduce((acc, attr) => ({ ...acc, [attr]: { $sum: `$${attr}` } }))
+            ...censusAttributes.reduce((acc, attr) => ({ ...acc, [attr]: { $sum: `$${attr}` } }), {})
           }
         }
       ]
