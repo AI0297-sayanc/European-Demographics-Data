@@ -35,67 +35,52 @@ module.exports = {
   async byRadius(req, res) {
     try {
       const {
-        nutsId, radius, countryCode, levelCode, censusAttributes
+        nutsId, radius, countryCode = null, levelCode = null, censusAttributes = []
       } = req.body
+      console.log("censusAttributes ==> ", censusAttributes)
       const query = {}
 
       // Validation....
       if (typeof nutsId !== "string" || nutsId.trim() === "") {
-        return res
-          .status(400)
-          .json({
-            error: true,
-            message: "Field 'nutsId must be non empty string !!!",
-          })
+        return res.status(400).json({ error: true, message: "Field 'nutsId must be non empty string !!!" })
       }
       // eslint-disable-next-line no-restricted-globals
-      if (isNaN(String(radius))) {
-        return res
-          .status(400)
-          .json({
-            error: true,
-            message: "Field 'radius' must be valid number !!!",
-          })
+      if (isNaN(radius) || typeof radius !== "number") {
+        return res.status(400).json({ error: true, message: "Field 'radius' must be valid number !!!" })
       }
 
-      if (
-        countryCode !== undefined
-        && typeof countryCode === "string"
-        && countryCode.trim() !== ""
-      ) {
+      if (countryCode !== null) {
+        if (typeof countryCode !== "string" || countryCode.trim() === "") {
+          return res.status(400).json({ error: true, message: "Field 'countryCode' must be non empty string !!!" })
+        }
         query.countryCode = countryCode
       }
 
       // eslint-disable-next-line no-restricted-globals
-      if (levelCode !== undefined && !isNaN(levelCode)) {
+      if (levelCode !== null) {
+        // eslint-disable-next-line no-restricted-globals
+        if (isNaN(String(levelCode)) || typeof levelCode !== "number") {
+          return res.status(400).json({ error: true, message: "Field 'levelCode must be a valid number !!!" })
+        }
         query.levelCode = levelCode
       }
-
-      // if (
-      //   Array.isArray(censusAttribute)
-      //   || censusAttribute.length > 0
-      //   || censusAttribute.every((ele) => typeof ele === "string")
-      // ) {
-      //   query.censusAttribute = { $in: censusAttribute }
-      // } else {
-      //   return res
-      //     .status(400)
-      //     .json({
-      //       error: true,
-      //       message:
-      //         "Field 'censusAttribute' must be non empty array of string !!!",
-      //     })
-      // }
+      if (
+        !Array.isArray(censusAttributes)
+        || censusAttributes.length === 0
+        || censusAttributes.every((ele) => typeof ele !== "string")
+      ) {
+        return res.status(400).json({ error: true, message: "censusAttributes must be a non empty array of string !!!" })
+      }
+      query.censusAttributes = { $in: censusAttributes }
       query.nutsId = nutsId
-      // query.censusAttribute = censusAttribute
 
-      const upperNutsId = await nutsId.toUpperCase()
-      const data = await Region.findOne({ nutsId: upperNutsId }).lean().exec()
+      const upperNutsId = nutsId.toUpperCase()
+      const centroidRegion = await Region.findOne({ nutsId: upperNutsId }).lean().exec()
 
-      if (data == null) {
+      if (centroidRegion == null) {
         return res
           .status(400)
-          .json({ error: true, message: "No data found !!" })
+          .json({ error: true, message: "No centroidRegion found !!" })
       }
       const nutsIds = await Region.find({
         centroid: {
@@ -103,8 +88,8 @@ module.exports = {
             $geometry: {
               type: "Point",
               coordinates: [
-                Number(data.centroid.coordinates[0]),
-                Number(data.centroid.coordinates[1]),
+                Number(centroidRegion.centroid.coordinates[0]),
+                Number(centroidRegion.centroid.coordinates[1]),
               ],
             },
             $maxDistance: Number(radiusConvert.miles2meters(radius)), // convert input radius in miles to meters
@@ -114,19 +99,11 @@ module.exports = {
         .select("-_id nutsId")
         .lean()
         .exec()
-      query.nutsId = nutsId
+      // query.nutsId = nutsId
       const nutsArray = nutsIds.map((x) => x.nutsId)
-      // const query = {}
 
       // for nutsid
-      if (nutsArray && Array.isArray(nutsArray)) {
-        query.nutsId = { $in: nutsArray }
-      } else {
-        return res.status(400).json({ error: true, message: "nutsIds must be an array" })
-      }
-      if (!Array.isArray(censusAttributes)) {
-        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
-      }
+      query.nutsId = { $in: nutsArray }
 
       const pipeline = [
         {
@@ -160,7 +137,7 @@ module.exports = {
         }
       ]
       // console.log("pipeline", JSON.stringify(pipeline, null, 2))
-      const [[censusData], references] = await Promise.all([
+      const [[censusData = {}], references] = await Promise.all([
         Census.aggregate(pipeline),
         Reference.find({ attribute: censusAttributes }).lean().exec()
       ])
