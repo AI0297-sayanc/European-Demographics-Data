@@ -6,9 +6,6 @@ const References = require("./References")
 const RegionSearchRadius = require("./RegionsSearch")
 const DemographicsData = require("./DemographicsData")
 
-// Demographic Data routes...
-router.use("/demographics", DemographicsData)
-
 // Regions Search routes....
 router.post("/search/radius", RegionSearchRadius.byRadius)
 
