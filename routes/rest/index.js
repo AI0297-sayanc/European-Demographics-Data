@@ -3,14 +3,14 @@ const router = express.Router()
 const { authMiddleware } = require("../../middlewares")
 
 const References = require("./References")
-const RegionSearchRadius = require("./RegionsSearch")
+const RegionSearch = require("./RegionsSearch")
 const DemographicsData = require("./DemographicsData")
 
-// Regions Search routes....
-router.post("/search/radius", RegionSearchRadius.byRadius)
-
-// DemographicsData routes................
+// Demographic Data routes...
 router.use("/demographics", DemographicsData)
+
+// Regions Search routes....
+router.use("/search", RegionSearch)
 
 // References routes................
 router.use("/references", References)
