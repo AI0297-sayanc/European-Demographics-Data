@@ -2,7 +2,31 @@ const Reference = require("../../../models/reference")
 const Census = require("../../../models/census")
 
 module.exports = {
+/**
+ * @api {post} /demographics/nutsids Retrieve computed data from Census Data by NUTS ID
+ * @apiName Retrieve computed data
+ * @apiGroup Demographics Data
 
+ * @apiVersion 1.0.0
+ *
+ * @apiParam {Array} nutsIds Array of NUTS IDs for filtering.
+ * @apiParam {Array} censusAttributes Array of census attributes.
+ *   @apiSuccessExample { json
+   Success-Response: 200
+  *     {
+  *       "error": false,
+  *       "censusData": [
+  *         {
+  *           "name": "Population",
+  *           "attribute": "EU_E002",
+  *           "value": 2598816,
+  *           "description": "Total Population"
+  *
+
+  *   ]
+  *
+}
+ *  */
   async byNutsId(req, res) {
     try {
       const { nutsIds, censusAttributes } = req.body
@@ -28,11 +52,11 @@ module.exports = {
         {
           $project: {
             _id: 0,
-            nutsId: "$nutsId",
-            name: "$name",
-            levelCode: "$levelcode",
-            geoLevelName: 1,
-            countryCode: 1,
+            // nutsId: "$nutsId",
+            // name: "$name",
+            // levelCode: "$levelcode",
+            // geoLevelName: 1,
+            // countryCode: 1,
             ...censusAttributes.reduce((acc, attr) => {
               acc[attr] = `$censusAttributes.${attr}`
               return acc
@@ -42,11 +66,7 @@ module.exports = {
         {
           $group: {
             _id: null,
-            ...censusAttributes.reduce((acc, attr) => {
-              acc[attr] = { $sum: `$${attr}` }
-              return acc
-            }, {})
-
+            ...censusAttributes.reduce((acc, attr) => ({ ...acc, [attr]: { $sum: `$${attr}` } }))
           }
         }
       ]
