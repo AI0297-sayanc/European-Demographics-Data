@@ -38,8 +38,6 @@ test.serial("Validating Response Schema", async (t) => {
     .set("Accept", "application/json")
     .send(requestBody)
 
-  // console.log("response.body ==> ", response.body)
-
   t.is(response.status, 200)
 
   const { error } = schema.validate(response.body, { abortEarly: false })
