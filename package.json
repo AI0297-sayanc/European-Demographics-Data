@@ -17,7 +17,7 @@
     "lint:all": "eslint './**/*.js'",
     "lint:fix": "eslint './**/*.js' --quiet --fix",
     "gendoc": "apidoc -i routes/ -o public/docs",
-    "test": "ava"
+    "test": "NODE_ENV=test ava"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.0",
