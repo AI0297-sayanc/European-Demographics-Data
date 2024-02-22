@@ -38,9 +38,13 @@ module.exports = {
       if (typeof nutsId !== "string" || nutsId.trim() === "") {
         return res.status(400).json({ error: true, message: "Field 'nutsId' must be valid string !!!" })
       }
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(String(radius))) {
-        return res.status(400).json({ error: true, message: "Field 'radius' must be valid number !!!" })
+      if (typeof radius !== "number") {
+        return res
+          .status(400)
+          .json({
+            error: true,
+            message: "Field 'radius' must be valid number !!!",
+          })
       }
       // eslint-disable-next-line max-len, no-restricted-globals
       if (!Array.isArray(levelCodes) || levelCodes.length === 0 || !levelCodes.every((ele) => !isNaN(ele))) {
