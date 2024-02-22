@@ -77,11 +77,10 @@ module.exports = {
         }
       ]
       // console.log("pipeline", JSON.stringify(pipeline, null, 2))
-      const [[censusData], references] = await Promise.all([
+      const [[censusData = {}], references] = await Promise.all([
         Census.aggregate(pipeline),
         Reference.find({ attribute: censusAttributes }).lean().exec()
       ])
-      // console.log(censusData);
 
       return res.status(200).json({
         error: false,
@@ -98,6 +97,7 @@ module.exports = {
           })
       })
     } catch (err) {
+      console.log("err ==> ", err)
       return res.status(500).json({ error: true, message: err.message })
     }
   }

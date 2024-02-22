@@ -35,7 +35,7 @@ module.exports = {
   async byRadius(req, res) {
     try {
       const {
-        nutsId, radius, countryCode, levelCode, censusAttributes
+        nutsId, radius, countryCode = null, levelCode = null, censusAttributes
       } = req.body
       const query = {}
 
@@ -49,7 +49,7 @@ module.exports = {
           })
       }
       // eslint-disable-next-line no-restricted-globals
-      if (isNaN(String(radius))) {
+      if (typeof radius !== "number") {
         return res
           .status(400)
           .json({
@@ -58,16 +58,14 @@ module.exports = {
           })
       }
 
-      if (
-        countryCode !== undefined
-        && typeof countryCode === "string"
-        && countryCode.trim() !== ""
-      ) {
+      if (countryCode !== null) {
+        if (typeof countryCode !== "string" || countryCode.trim() === "") return res.status(400).json({ error: true, message: "Field 'countryCode' must be a valid string" })
         query.countryCode = countryCode
       }
 
-      // eslint-disable-next-line no-restricted-globals
-      if (levelCode !== undefined && !isNaN(levelCode)) {
+      if (levelCode !== null) {
+        // eslint-disable-next-line no-restricted-globals
+        if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number!" })
         query.levelCode = levelCode
       }
 
@@ -89,7 +87,7 @@ module.exports = {
       query.nutsId = nutsId
       // query.censusAttribute = censusAttribute
 
-      const upperNutsId = await nutsId.toUpperCase()
+      const upperNutsId = nutsId.toUpperCase()
       const data = await Region.findOne({ nutsId: upperNutsId }).lean().exec()
 
       if (data == null) {
@@ -160,7 +158,7 @@ module.exports = {
         }
       ]
       // console.log("pipeline", JSON.stringify(pipeline, null, 2))
-      const [[censusData], references] = await Promise.all([
+      const [[censusData = {}], references] = await Promise.all([
         Census.aggregate(pipeline),
         Reference.find({ attribute: censusAttributes }).lean().exec()
       ])
