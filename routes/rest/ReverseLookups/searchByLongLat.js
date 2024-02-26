@@ -40,7 +40,6 @@ module.exports = {
 
       const searchRegionData = await Region.find(
         {
-          geoLevelName: { $in: ["Regions", "Provinces", "Municipalities"] },
           geometry: {
             $geoIntersects: {
               $geometry: {
@@ -51,7 +50,8 @@ module.exports = {
           },
         }
       )
-        .select("-_id nutsId name levelCode geoLevelName parentId ")
+        .select("-_id nutsId name levelCode geoLevelName parentId")
+        .sort({ levelCode: 1 })
         .lean()
         .exec()
 

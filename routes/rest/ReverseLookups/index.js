@@ -9,6 +9,6 @@ const router = express.Router()
 
 // References routes................
 router.get("/point", searchByLongLat.searchByLongLat)
-// router.get("/nutsid/:nutsId", )
+router.get("/nutsid/:nutsId", searchByNutsId.searchByNutsId)
 
 module.exports = router
