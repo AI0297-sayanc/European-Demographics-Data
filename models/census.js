@@ -13,7 +13,11 @@ const CensusSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  geoLevelCode: {
+  // geoLevelCode: {
+  //   type: String,
+  //   required: true,
+  // },
+  geoLevelName: {
     type: String,
     required: true,
   },
