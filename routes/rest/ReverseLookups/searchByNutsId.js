@@ -37,19 +37,19 @@ module.exports = {
       // console.log(getNutsId);
       if (region === null) return res.status(400).json({ error: true, message: `No such nuts id ${nutsId}` })
 
-      const searchByNutsId = await Region.find({
-        levelCode: { $gt: region.levelCode },
+      const regions = await Region.find({
+        levelCode: { $lt: region.levelCode },
         geometry: {
           $geoIntersects: {
             $geometry: region.centroid
           },
         },
       })
-        .select("-_id nutsId name levelCode geoLevelName parentId ")
-        .sort({ levelCode: 1 })
+        .select("-_id nutsId name levelCode geoLevelName parentId countryCode ")
+        .sort({ levelCode: -1 })
         .lean()
         .exec()
-      return res.status(200).json({ error: false, searchByNutsId })
+      return res.status(200).json({ error: false, regions })
     } catch (error) {
       return res.status(500).json({ error: true, message: error.message })
     }

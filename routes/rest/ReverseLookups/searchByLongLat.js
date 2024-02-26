@@ -38,7 +38,7 @@ module.exports = {
       }
       // validation end
 
-      const searchRegionData = await Region.find(
+      const regions = await Region.find(
         {
           geometry: {
             $geoIntersects: {
@@ -50,12 +50,12 @@ module.exports = {
           },
         }
       )
-        .select("-_id nutsId name levelCode geoLevelName parentId")
-        .sort({ levelCode: 1 })
+        .select("-_id nutsId name levelCode geoLevelName parentId countryCode")
+        .sort({ levelCode: -1 })
         .lean()
         .exec()
 
-      return res.status(200).json({ error: false, regions: searchRegionData })
+      return res.status(200).json({ error: false, regions })
     } catch (error) {
       return res.status(500).json({ error: true, message: error.message })
     }
