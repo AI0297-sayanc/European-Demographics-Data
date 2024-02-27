@@ -2792,9 +2792,6 @@ module.exports = [
     }
   },
   {
-    _id: {
-      $oid: "65c9b8127c9694b5773cec82"
-    },
     nutsId: "DK101",
     name: "Copenhagen",
     levelCode: 3,

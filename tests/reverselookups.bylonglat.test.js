@@ -66,7 +66,7 @@ test.serial("Check if lat is valid", async (t) => {
   t.is(invalidLatResponse.body.message, "Field 'lat' not valid !!!")
 })
 
-test.only("Check if count is less than or equal to 3", async (t) => {
+test.serial("Check if count is less than or equal to 3", async (t) => {
   const response = await request(app)
     .get("/api/v1/reverseLookup/point")
     .query(query)
