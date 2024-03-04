@@ -97,7 +97,7 @@ module.exports = {
           })
       })
     } catch (err) {
-      console.log("err ==> ", err)
+      // console.log("err ==> ", err)
       return res.status(500).json({ error: true, message: err.message })
     }
   }
