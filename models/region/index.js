@@ -47,7 +47,9 @@ const RegionSchema = new mongoose.Schema({
     coordinates: {
       type: mongoose.Schema.Types.Mixed
     }
-  }
+  },
+
+  adjacentRegions: [String],
 })
 
 RegionSchema.set("timestamps", true)
