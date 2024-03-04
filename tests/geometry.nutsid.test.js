@@ -46,14 +46,14 @@ test.serial("Validating Response Schema", async (t) => {
 })
 
 test.serial("Check if nutsId is valid", async (t) => {
-  const invalidLongResponse = await request(app)
+  const response = await request(app)
     .get("/api/v1/geometry")
     .query({ nutsId: 999 })
     .set("Accept", "application/json")
 
-  t.is(invalidLongResponse.status, 400)
-  t.true(invalidLongResponse.body.error)
-  t.is(invalidLongResponse.body.message, "Field 'nutsId' not valid !!!")
+  t.is(response.status, 400)
+  t.true(response.body.error)
+  t.is(response.body.message, "Field 'nutsId' not valid !!!")
 })
 
 test.serial("Comparing valid and invalid coordinates", async (t) => {

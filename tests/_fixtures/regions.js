@@ -9,6 +9,7 @@ module.exports = [
     geoLevelName: "Regions",
     parentId: null,
     countryCode: "DK",
+    adjacentRegions: ["DK02", "DK03"],
     centroid: {
       type: "Point",
       coordinates: [
