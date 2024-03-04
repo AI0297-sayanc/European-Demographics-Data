@@ -18,7 +18,7 @@ const nutsId = {
   2: "999",
 }
 
-test.only("Validating Response Schema", async (t) => {
+test.serial("Validating Response Schema", async (t) => {
   const schema = Joi.object({
     error: Joi.boolean().required(),
     nutsId: Joi.string().required(),
@@ -59,7 +59,6 @@ test.only("Validating Response Schema", async (t) => {
     }).required()
   })
   const response = await request(app).get(`/api/v1/geometry/${nutsId[1]}`).set("Accept", "application/json")
-  console.log("response.body ==> ", response.body)
   const { error } = schema.validate(response.body, { abortEarly: false })
   t.is(error === undefined, true, error?.message)
 })
