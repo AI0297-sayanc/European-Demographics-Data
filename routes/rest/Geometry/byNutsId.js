@@ -2,7 +2,7 @@ const Region = require("../../../models/region")
 
 module.exports = {
   /**
-  * @api {get} /regionsearch/:nutsId Get geometry by Nuts Id
+  * @api {get} /geometry/:nutsId Get geometry by Nuts Id
   * @apiName ByNutsId
   * @apiGroup Geometry
   * @apiVersion  1.0.0
@@ -45,7 +45,7 @@ module.exports = {
       const geometry = await Region.findOne({
         nutsId
       })
-        .select("-_id")
+        .select("-_id -adjacentRegions")
         .lean()
         .exec()
       if (geometry === null) return res.status(400).json({ error: true, message: `No such nuts id ${nutsId}` })
