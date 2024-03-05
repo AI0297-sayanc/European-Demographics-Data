@@ -102,7 +102,7 @@ test.serial("Check if page is 1 in all output data", async (t) => {
     ).required(),
     totalData: Joi.number().required(),
     totalPages: Joi.number().required(),
-    page: Joi.number().required(),
+    page: Joi.number().valid(1).required(),
     size: Joi.number().required()
   })
 
@@ -130,7 +130,7 @@ test.serial("Check if size is 10 in all output data", async (t) => {
     totalData: Joi.number().required(),
     totalPages: Joi.number().required(),
     page: Joi.number().required(),
-    size: Joi.number().required()
+    size: Joi.number().valid(10).required()
   })
 
   const { error } = schema.validate(response.body, { abortEarly: false })
