@@ -16,7 +16,9 @@ test.afterEach(teardownFixtures)
 const query = {
   name: "Region Hovedstaden",
   levelCode: 1,
-  countryCode: "DK"
+  countryCode: "DK",
+  page: 1,
+  size: 10
 }
 
 test.serial("Validating Response Schema for searchidentifiersByName", async (t) => {
@@ -28,7 +30,7 @@ test.serial("Validating Response Schema for searchidentifiersByName", async (t) 
         name: Joi.string().required(),
         levelCode: Joi.number().required(),
         geoLevelName: Joi.string().required(),
-        parentId: Joi.string().allow(null).required(), // Allow null for parentId
+        parentId: Joi.string().allow(null).required(),
         countryCode: Joi.string().required()
       })
     ).required(),
@@ -70,7 +72,7 @@ test.serial("Expect empty results for other levelCode", async (t) => {
   t.is(response.body?.regions.length, 0)
 })
 
-test.only("Expect empty results for other countryCode", async (t) => {
+test.serial("Expect empty results for other countryCode", async (t) => {
   const response = await request(app)
     .get("/api/v1/searchIdentifiers/byname")
     .query({ ...query, countryCode: "999" })
@@ -79,4 +81,93 @@ test.only("Expect empty results for other countryCode", async (t) => {
   t.is(response.status, 200)
   t.false(response.body.error)
   t.is(response.body?.regions.length, 0)
+})
+
+test.serial("Check if page is 1 in all output data", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query(query)
+
+  const schema = Joi.object({
+    error: Joi.boolean().required(),
+    regions: Joi.array().items(
+      Joi.object({
+        nutsId: Joi.string().required(),
+        name: Joi.string().required(),
+        levelCode: Joi.number().required(),
+        geoLevelName: Joi.string().required(),
+        parentId: Joi.string().allow(null).required(),
+        countryCode: Joi.string().required()
+      })
+    ).required(),
+    totalData: Joi.number().required(),
+    totalPages: Joi.number().required(),
+    page: Joi.number().required(),
+    size: Joi.number().required()
+  })
+
+  const { error } = schema.validate(response.body, { abortEarly: false })
+  t.is(error === undefined, true, error?.message)
+})
+
+test.serial("Check if size is 10 in all output data", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query(query)
+
+  const schema = Joi.object({
+    error: Joi.boolean().required(),
+    regions: Joi.array().items(
+      Joi.object({
+        nutsId: Joi.string().required(),
+        name: Joi.string().required(),
+        levelCode: Joi.number().required(),
+        geoLevelName: Joi.string().required(),
+        parentId: Joi.string().allow(null).required(),
+        countryCode: Joi.string().required()
+      })
+    ).required(),
+    totalData: Joi.number().required(),
+    totalPages: Joi.number().required(),
+    page: Joi.number().required(),
+    size: Joi.number().required()
+  })
+
+  const { error } = schema.validate(response.body, { abortEarly: false })
+  t.is(error === undefined, true, error?.message)
+})
+
+test.serial("Check if page is 1 and size is 10 in all output data", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query(query)
+
+  const schema = Joi.object({
+    error: Joi.boolean().required(),
+    regions: Joi.array().items(
+      Joi.object({
+        nutsId: Joi.string().required(),
+        name: Joi.string().required(),
+        levelCode: Joi.number().required(),
+        geoLevelName: Joi.string().required(),
+        parentId: Joi.string().allow(null).required(),
+        countryCode: Joi.string().required()
+      })
+    ).required(),
+    totalData: Joi.number().required(),
+    totalPages: Joi.number().required(),
+    page: Joi.number().required(),
+    size: Joi.number().required()
+  })
+
+  const { error } = schema.validate(response.body, { abortEarly: false })
+  t.is(error === undefined, true, error?.message)
+})
+
+test.serial("Check if page is 2 and size is 0 in all output data", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query({ ...query, page: 2, size: 10 })
+
+  t.is(response.body.regions?.length, 0)
 })
