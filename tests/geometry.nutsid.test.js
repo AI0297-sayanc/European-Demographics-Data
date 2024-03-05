@@ -58,6 +58,7 @@ test.serial("Validating Response Schema", async (t) => {
       ).required()
     }).required()
   })
+
   const response = await request(app).get(`/api/v1/geometry/${nutsId[1]}`).set("Accept", "application/json")
   const { error } = schema.validate(response.body, { abortEarly: false })
   t.is(error === undefined, true, error?.message)
