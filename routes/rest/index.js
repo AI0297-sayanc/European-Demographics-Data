@@ -7,9 +7,13 @@ const RegionSearch = require("./RegionsSearch")
 const DemographicsData = require("./DemographicsData")
 const Geometry = require("./Geometry")
 const ReverseLookups = require("./ReverseLookups")
+const SearchIdentifiers = require("./SearchIdentifiers")
 
 // Demographic Data routes...
 router.use("/demographics", DemographicsData)
+
+// Search Identifiers...
+router.use("/searchIdentifiers", SearchIdentifiers)
 
 // Regions Search routes....
 router.use("/search", RegionSearch)
