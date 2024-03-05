@@ -31,32 +31,32 @@ test.serial("Validating Response Schema", async (t) => {
       type: Joi.string().valid("Point").required(),
       coordinates: Joi.array().items(Joi.number()).length(2).required()
     }).required(),
-    geometry: Joi.object({
-      type: Joi.alternatives().try(
-        Joi.string().valid("Polygon"),
-        Joi.string().valid("MultiPolygon")
-      ).required(),
-      coordinates: Joi.alternatives().try(
-        Joi.array().items(
+    geometry: Joi.alternatives().try(
+      Joi.object().required().keys({
+        type: Joi.string().required().valid("Polygon"),
+        coordinates: Joi.array().items(
           Joi.array().items(
             Joi.array().length(2).items().ordered(
-              Joi.number().min(-180).max(180),
-              Joi.number().min(-90).max(90)
+              Joi.number().min(-180).max(180), // Longitude
+              Joi.number().min(-90).max(90) // Latitude
             )
           )
-        ),
-        Joi.array().items(
+        )
+      }),
+      Joi.object().required().keys({
+        type: Joi.string().required().valid("MultiPolygon"),
+        coordinates: Joi.array().items(
           Joi.array().items(
             Joi.array().items(
               Joi.array().length(2).items().ordered(
-                Joi.number().min(-180).max(180),
-                Joi.number().min(-90).max(90)
+                Joi.number().min(-180).max(180), // Longitude
+                Joi.number().min(-90).max(90) // Latitude
               )
             )
           )
         )
-      ).required()
-    }).required()
+      }),
+    )
   })
 
   const response = await request(app).get(`/api/v1/geometry/${nutsId[1]}`).set("Accept", "application/json")
