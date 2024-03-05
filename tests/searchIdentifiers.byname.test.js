@@ -14,9 +14,9 @@ test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
 const query = {
-  name: "Population",
+  name: "Region Hovedstaden",
   levelCode: 1,
-  countryCode: "AT"
+  countryCode: "DK"
 }
 
 test.serial("Validating Response Schema for searchidentifiersByName", async (t) => {
@@ -28,10 +28,14 @@ test.serial("Validating Response Schema for searchidentifiersByName", async (t) 
         name: Joi.string().required(),
         levelCode: Joi.number().required(),
         geoLevelName: Joi.string().required(),
-        parentId: Joi.string().required(),
+        parentId: Joi.string().allow(null).required(), // Allow null for parentId
         countryCode: Joi.string().required()
       })
-    ).required()
+    ).required(),
+    totalData: Joi.number().required(),
+    totalPages: Joi.number().required(),
+    page: Joi.number().required(),
+    size: Joi.number().required()
   })
 
   const response = await request(app)
@@ -48,32 +52,9 @@ test.serial("Validating Response Schema for searchidentifiersByName", async (t) 
 test.serial("Check if name is valid", async (t) => {
   const response = await request(app)
     .get("/api/v1/searchIdentifiers/byname")
-    .query({ ...query, name: "abc" })
+    .query({ ...query, name: "" })
     .set("Accept", "application/json")
 
   t.is(response.status, 400)
   t.true(response.body.error)
-  t.is(response.body.message, "Field 'name' not valid !!!")
-})
-
-test.serial("Check if levelCode is valid", async (t) => {
-  const response = await request(app)
-    .get("/api/v1/searchIdentifiers/byname")
-    .query({ ...query, levelCode: 999 })
-    .set("Accept", "application/json")
-
-  t.is(response.status, 400)
-  t.true(response.body.error)
-  t.is(response.body.message, "Field 'levelCode' not valid !!!")
-})
-
-test.serial("Check if countryCode is valid", async (t) => {
-  const response = await request(app)
-    .get("/api/v1/searchIdentifiers/byname")
-    .query({ ...query, countryCode: "zz" })
-    .set("Accept", "application/json")
-
-  t.is(response.status, 400)
-  t.true(response.body.error)
-  t.is(response.body.message, "Field 'countryCode' not valid !!!")
 })

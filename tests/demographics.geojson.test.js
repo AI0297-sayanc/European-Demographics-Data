@@ -79,7 +79,7 @@ test.serial("If levelCode is null, expecting 200", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/geojson")
     .set("Accept", "application/json")
-    .send({ ...requestBody, levelCode: null })
+    .send({ ...requestBody, levelCode: undefined })
   t.is(response.status, 200)
 })
 
