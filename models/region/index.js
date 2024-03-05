@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const mongoosePaginate = require("mongoose-paginate-v2")
 
 const CoordinatePair = require("../schemas/coordinate-pair.class")
 mongoose.Schema.Types.CoordinatePair = CoordinatePair
@@ -55,6 +56,6 @@ const RegionSchema = new mongoose.Schema({
 RegionSchema.set("timestamps", true)
 RegionSchema.set("toJSON", { virtuals: true })
 RegionSchema.set("toObject", { virtuals: true })
-// RegionSchema.plugin(mongoosePaginate)
+RegionSchema.plugin(mongoosePaginate)
 
 module.exports = mongoose.model("Region", RegionSchema)
