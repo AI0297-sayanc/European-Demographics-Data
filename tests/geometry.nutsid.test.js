@@ -13,8 +13,9 @@ test.after.always(teardownMongo)
 test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
-const query = {
-  nutsId: "DK159"
+const nutsId = {
+  1: "DK01",
+  2: "999",
 }
 
 test.serial("Validating Response Schema", async (t) => {
@@ -24,64 +25,49 @@ test.serial("Validating Response Schema", async (t) => {
     name: Joi.string().required(),
     levelCode: Joi.number().integer().required(),
     geoLevelName: Joi.string().required(),
-    parentId: Joi.string().required(),
+    parentId: Joi.string().allow(null).required(),
     countryCode: Joi.string().required(),
     centroid: Joi.object({
-      type: Joi.string().valid("point").required(),
+      type: Joi.string().valid("Point").required(),
       coordinates: Joi.array().items(Joi.number()).length(2).required()
     }).required(),
-    geometry: Joi.object({
-      type: Joi.alternatives().try(Joi.string().valid("polygon"), Joi.string().valid("multipolygon")).required(),
-      coordinates: Joi.array().items(
-        Joi.array().items(
-          Joi.array().items(Joi.number()).length(2)
+    geometry: Joi.alternatives().try(
+      Joi.object().required().keys({
+        type: Joi.string().required().valid("Polygon"),
+        coordinates: Joi.array().items(
+          Joi.array().items(
+            Joi.array().length(2).items().ordered(
+              Joi.number().min(-180).max(180), // Longitude
+              Joi.number().min(-90).max(90) // Latitude
+            )
+          )
         )
-      ).required()
-    }).required()
+      }),
+      Joi.object().required().keys({
+        type: Joi.string().required().valid("MultiPolygon"),
+        coordinates: Joi.array().items(
+          Joi.array().items(
+            Joi.array().items(
+              Joi.array().length(2).items().ordered(
+                Joi.number().min(-180).max(180), // Longitude
+                Joi.number().min(-90).max(90) // Latitude
+              )
+            )
+          )
+        )
+      }),
+    )
   })
-  const response = await request(app).get("/api/v1/geometry").set("Accept", "application/json")
 
+  const response = await request(app).get(`/api/v1/geometry/${nutsId[1]}`).set("Accept", "application/json")
   const { error } = schema.validate(response.body, { abortEarly: false })
   t.is(error === undefined, true, error?.message)
 })
 
 test.serial("Check if nutsId is valid", async (t) => {
-  const invalidLongResponse = await request(app)
-    .get("/api/v1/geometry")
-    .query({ nutsId: 999 })
-    .set("Accept", "application/json")
-
-  t.is(invalidLongResponse.status, 400)
-  t.true(invalidLongResponse.body.error)
-  t.is(invalidLongResponse.body.message, "Field 'nutsId' not valid !!!")
-})
-
-test.serial("Comparing valid and invalid coordinates", async (t) => {
-  const validCoordinates = [12.470167490157134, 55.747539659747865]
-  const invalidCoordinates = [200, 1000]
-
-  const responseValid = await request(app)
-    .get("/api/v1/geometry")
-    .query({ ...query, coordinates: validCoordinates })
-    .set("Accept", "application/json")
-
-  const responseInvalid = await request(app)
-    .get("/api/v1/geometry")
-    .query({ ...query, coordinates: invalidCoordinates })
-    .set("Accept", "application/json")
-
-  t.is(responseValid.status, 200)
-
-  t.is(responseInvalid.status, 400)
-})
-
-test.serial("Checking if coordinates fall out of range", async (t) => {
-  const coordinatesOutsideRange = [200, 1000]
-
   const response = await request(app)
-    .get("/api/v1/geometry")
-    .query({ ...query, coordinates: coordinatesOutsideRange })
+    .get(`/api/v1/geometry/${nutsId[2]}`)
     .set("Accept", "application/json")
-
   t.is(response.status, 400)
+  t.true(response.body.error)
 })

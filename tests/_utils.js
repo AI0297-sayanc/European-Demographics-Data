@@ -1,6 +1,5 @@
 const mongoose = require("mongoose")
 const { MongoMemoryServer } = require("mongodb-memory-server")
-const httpMocks = require("node-mocks-http")
 const Fixtures = require("node-mongodb-fixtures")
 
 let mongod
@@ -31,19 +30,5 @@ module.exports = {
   async teardownFixtures(t) {
     await t.context.fixtures.unload()
     await t.context.fixtures.disconnect()
-  },
-
-  async runRouteHandler(fn, req = {}) {
-    const request = httpMocks.createRequest({
-      method: "GET", // default
-      url: "/", // default
-      ...req
-    })
-    const response = httpMocks.createResponse()
-    await fn(request, response)
-    return {
-      status: response.statusCode,
-      body: JSON.parse(response._getData())
-    }
   }
 }
