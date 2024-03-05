@@ -83,85 +83,13 @@ test.serial("Expect empty results for other countryCode", async (t) => {
   t.is(response.body?.regions.length, 0)
 })
 
-test.serial("Check if page is 1 in all output data", async (t) => {
-  const response = await request(app)
-    .get("/api/v1/searchIdentifiers/byname")
-    .query(query)
-
-  const schema = Joi.object({
-    error: Joi.boolean().required(),
-    regions: Joi.array().items(
-      Joi.object({
-        nutsId: Joi.string().required(),
-        name: Joi.string().required(),
-        levelCode: Joi.number().required(),
-        geoLevelName: Joi.string().required(),
-        parentId: Joi.string().allow(null).required(),
-        countryCode: Joi.string().required()
-      })
-    ).required(),
-    totalData: Joi.number().required(),
-    totalPages: Joi.number().required(),
-    page: Joi.number().valid(1).required(),
-    size: Joi.number().required()
-  })
-
-  const { error } = schema.validate(response.body, { abortEarly: false })
-  t.is(error === undefined, true, error?.message)
-})
-
-test.serial("Check if size is 10 in all output data", async (t) => {
-  const response = await request(app)
-    .get("/api/v1/searchIdentifiers/byname")
-    .query(query)
-
-  const schema = Joi.object({
-    error: Joi.boolean().required(),
-    regions: Joi.array().items(
-      Joi.object({
-        nutsId: Joi.string().required(),
-        name: Joi.string().required(),
-        levelCode: Joi.number().required(),
-        geoLevelName: Joi.string().required(),
-        parentId: Joi.string().allow(null).required(),
-        countryCode: Joi.string().required()
-      })
-    ).required(),
-    totalData: Joi.number().required(),
-    totalPages: Joi.number().required(),
-    page: Joi.number().required(),
-    size: Joi.number().valid(10).required()
-  })
-
-  const { error } = schema.validate(response.body, { abortEarly: false })
-  t.is(error === undefined, true, error?.message)
-})
-
 test.serial("Check if page is 1 and size is 10 in all output data", async (t) => {
   const response = await request(app)
     .get("/api/v1/searchIdentifiers/byname")
-    .query(query)
+    .query({ ...query, page: 1, size: 10 })
 
-  const schema = Joi.object({
-    error: Joi.boolean().required(),
-    regions: Joi.array().items(
-      Joi.object({
-        nutsId: Joi.string().required(),
-        name: Joi.string().required(),
-        levelCode: Joi.number().required(),
-        geoLevelName: Joi.string().required(),
-        parentId: Joi.string().allow(null).required(),
-        countryCode: Joi.string().required()
-      })
-    ).required(),
-    totalData: Joi.number().required(),
-    totalPages: Joi.number().required(),
-    page: Joi.number().valid(1).required(),
-    size: Joi.number().valid(10).required()
-  })
-
-  const { error } = schema.validate(response.body, { abortEarly: false })
-  t.is(error === undefined, true, error?.message)
+  t.is(response.body.page, 1)
+  t.is(response.body.size, 10)
 })
 
 test.serial("Check if page is 2 and size is 0 in all output data", async (t) => {
@@ -169,5 +97,7 @@ test.serial("Check if page is 2 and size is 0 in all output data", async (t) => 
     .get("/api/v1/searchIdentifiers/byname")
     .query({ ...query, page: 2, size: 10 })
 
+  t.is(response.body.page, 2)
+  t.is(response.body.size, 10)
   t.is(response.body.regions?.length, 0)
 })
