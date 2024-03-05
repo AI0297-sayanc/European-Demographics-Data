@@ -58,3 +58,25 @@ test.serial("Check if name is valid", async (t) => {
   t.is(response.status, 400)
   t.true(response.body.error)
 })
+
+test.serial("Expect empty results for other levelCode", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query({ ...query, levelCode: 999 })
+    .set("Accept", "application/json")
+
+  t.is(response.status, 200)
+  t.false(response.body.error)
+  t.is(response.body?.regions.length, 0)
+})
+
+test.only("Expect empty results for other countryCode", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query({ ...query, countryCode: "999" })
+    .set("Accept", "application/json")
+
+  t.is(response.status, 200)
+  t.false(response.body.error)
+  t.is(response.body?.regions.length, 0)
+})
