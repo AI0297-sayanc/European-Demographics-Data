@@ -83,6 +83,22 @@ test.serial("Expect empty results for other countryCode", async (t) => {
   t.is(response.body?.regions.length, 0)
 })
 
+test.serial("Check if page is 1 in all output data", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query({ ...query, page: 1 })
+
+  t.is(response.body.page, 1)
+})
+
+test.serial("Check if size is 10 in all output data", async (t) => {
+  const response = await request(app)
+    .get("/api/v1/searchIdentifiers/byname")
+    .query({ ...query, size: 10 })
+
+  t.is(response.body.size, 10)
+})
+
 test.serial("Check if page is 1 and size is 10 in all output data", async (t) => {
   const response = await request(app)
     .get("/api/v1/searchIdentifiers/byname")
