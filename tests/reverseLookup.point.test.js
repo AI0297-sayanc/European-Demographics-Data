@@ -16,7 +16,6 @@ test.afterEach(teardownFixtures)
 const query = {
   long: 9.39561931121928,
   lat: 56.247671229173605
-
 }
 
 test.serial("Validating Response Schema for searchByLongLat", async (t) => {
@@ -45,25 +44,25 @@ test.serial("Validating Response Schema for searchByLongLat", async (t) => {
 })
 
 test.serial("Check if long is valid", async (t) => {
-  const invalidLongResponse = await request(app)
+  const response = await request(app)
     .get("/api/v1/reverseLookup/point")
     .query({ ...query, long: 999 })
     .set("Accept", "application/json")
 
-  t.is(invalidLongResponse.status, 400)
-  t.true(invalidLongResponse.body.error)
-  t.is(invalidLongResponse.body.message, "Field 'long' not valid !!!")
+  t.is(response.status, 400)
+  t.true(response.body.error)
+  t.is(response.body.message, "Field 'long' not valid !!!")
 })
 
 test.serial("Check if lat is valid", async (t) => {
-  const invalidLatResponse = await request(app)
+  const response = await request(app)
     .get("/api/v1/reverseLookup/point")
     .query({ ...query, lat: 999 })
     .set("Accept", "application/json")
 
-  t.is(invalidLatResponse.status, 400)
-  t.true(invalidLatResponse.body.error)
-  t.is(invalidLatResponse.body.message, "Field 'lat' not valid !!!")
+  t.is(response.status, 400)
+  t.true(response.body.error)
+  t.is(response.body.message, "Field 'lat' not valid !!!")
 })
 
 test.serial("Check if count is less than or equal to 3", async (t) => {
