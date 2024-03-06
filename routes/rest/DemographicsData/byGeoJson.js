@@ -34,7 +34,7 @@ module.exports = {
         await schema.validateAsync(geojson)
       } catch (joiErr) {
         req.logger.error(joiErr)
-        return res.status(400).json({ error: true, message: "Please provide valid geojson data with a single feature whose geometry type is a Polygon!" })
+        return res.status(400).json({ error: true, message: "Please provide valid geojson." })
       }
 
       const [{ geometry }] = geojson.features
@@ -91,19 +91,21 @@ module.exports = {
         mongoose.model("Reference").find({ attribute: censusAttributes }).lean().exec()
       ])
 
+      const formattedCensusData = Object.keys(censusData)
+        .filter((el) => el !== "_id")
+        .map((attr) => {
+          const ref = references.find((r) => r.attribute === attr)
+          return {
+            name: ref?.name,
+            attribute: attr,
+            value: censusData[attr],
+            description: ref?.description
+          }
+        })
+
       return res.status(200).json({
         error: false,
-        censusData: Object.keys(censusData)
-          .filter((el) => el !== "_id")
-          .map((attr) => {
-            const ref = references.find((r) => r.attribute === attr)
-            return {
-              name: ref?.name,
-              attribute: attr,
-              value: censusData[attr],
-              description: ref?.description
-            }
-          })
+        censusData: formattedCensusData
       })
     } catch (error) {
       req.logger.error(error)
