@@ -95,7 +95,7 @@ module.exports = {
           .status(400)
           .json({ error: true, message: "No data found !!" })
       }
-      const nutsIds = await Region.find({
+      const regions = await Region.find({
         centroid: {
           $nearSphere: {
             $geometry: {
@@ -113,12 +113,12 @@ module.exports = {
         .lean()
         .exec()
       query.nutsId = nutsId
-      const nutsArray = nutsIds.map((x) => x.nutsId)
+      const nutsIds = regions.map((x) => x.nutsId)
       // const query = {}
 
       // for nutsid
-      if (nutsArray && Array.isArray(nutsArray)) {
-        query.nutsId = { $in: nutsArray }
+      if (nutsIds && Array.isArray(nutsIds)) {
+        query.nutsId = { $in: nutsIds }
       } else {
         return res.status(400).json({ error: true, message: "nutsIds must be an array" })
       }
