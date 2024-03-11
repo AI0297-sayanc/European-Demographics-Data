@@ -2,6 +2,29 @@ const Joi = require("joi")
 const mongoose = require("mongoose")
 
 module.exports = {
+  /**
+ * @api {post} /demographicdata/geojson Search By GeoJSON
+ * @apiName ByGeoJson
+ * @apiGroup Demographic Data
+ * @apiVersion 1.0.0
+ * @apiHeader {String} Authorization The API-key
+ *
+ * @apiBody {Object} geojson GeoJSON data containing features for search
+ * @apiBody {Array} censusAttributes List of censusAttributes to retrieve
+ *
+ * @apiSuccessExample {json} Success-Response:200
+ * {
+ *   "error": false,
+ *   "censusData": [
+ *     {
+ *       "name": "Households",
+ *       "attribute": "EU_E002",
+ *       "value": 2234,
+ *       "description": "Number of households"
+ *     }
+ *   ]
+ * }
+  */
   async byGeojson(req, res) {
     try {
       const { geojson, censusAttributes } = req.body
