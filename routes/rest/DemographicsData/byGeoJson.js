@@ -10,10 +10,10 @@ module.exports = {
         return res.status(400).json({ error: true, message: "geojson field is required" })
       }
 
-      if (!Array.isArray(censusAttributes)) {
+      if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
         return res
           .status(400)
-          .json({ error: true, message: "censusAttributes must be an array" });
+          .json({ error: true, message: "censusAttributes must be a valid array" })
       }
 
       const schema = Joi.object().keys({
