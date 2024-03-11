@@ -10,6 +10,12 @@ module.exports = {
         return res.status(400).json({ error: true, message: "geojson field is required" })
       }
 
+      if (!Array.isArray(censusAttributes)) {
+        return res
+          .status(400)
+          .json({ error: true, message: "censusAttributes must be an array" });
+      }
+
       const schema = Joi.object().keys({
         type: Joi.string().required().valid("FeatureCollection"),
         features: Joi.array().length(1).required().items(
@@ -29,10 +35,6 @@ module.exports = {
           }).unknown()
         )
       }).unknown()
-
-      if (!Array.isArray(censusAttributes)) {
-        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
-      }
 
       try {
         await schema.validateAsync(geojson)
