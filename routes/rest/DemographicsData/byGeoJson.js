@@ -30,6 +30,10 @@ module.exports = {
         )
       }).unknown()
 
+      if (!Array.isArray(censusAttributes)) {
+        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
+      }
+
       try {
         await schema.validateAsync(geojson)
       } catch (joiErr) {
@@ -47,10 +51,6 @@ module.exports = {
       })
 
       const nutsIds = regions.map(({ nutsId }) => (nutsId))
-
-      if (!Array.isArray(censusAttributes)) {
-        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
-      }
 
       const query = { nutsId: { $in: nutsIds } }
 
