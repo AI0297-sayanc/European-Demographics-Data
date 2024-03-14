@@ -1,0 +1,34 @@
+[
+  {
+    "_id": "65eeebbefdd6edf5ded574ce",
+    "nutsId": "DK031",
+    "name": "Province Fyn",
+    "levelCode": 2,
+    "geoLevelName": "Provinces",
+    "countryCode": "DK",
+    "censusAttributes": {
+      "EU_E001": 504852,
+      "EU_E002": 245740,
+      "EU_E003": 350354,
+      "EU_E004": null,
+      "EU_E005": null,
+      "EU_E006": 50.69
+    }
+  },
+  {
+    "_id": "65eeebbefdd6edf5ded574cf",
+    "nutsId": "DK032",
+    "name": "Province Sydjylland",
+    "levelCode": 2,
+    "geoLevelName": "Provinces",
+    "countryCode": "DK",
+    "censusAttributes": {
+      "EU_E001": 733191,
+      "EU_E002": 348395,
+      "EU_E003": 396164,
+      "EU_E004": null,
+      "EU_E005": null,
+      "EU_E006": 53.06
+    }
+  }
+]

@@ -1,3 +1,8 @@
+const cuid = require("cuid")
+const fs = require("node:fs/promises")
+const { rimraf } = require("rimraf")
+const execa = require("execa")
+
 const Region = require("../../../models/region")
 const Census = require("../../../models/census")
 const Reference = require("../../../models/reference")
@@ -33,9 +38,10 @@ module.exports = {
   */
 
   async byRadius(req, res) {
+    const reqId = cuid() // unique identifier for the endpoint call
     try {
       const {
-        nutsId, radius, countryCode = null, levelCode = null, censusAttributes
+        nutsId, radius, countryCode = null, levelCode = 3, censusAttributes
       } = req.body
       const query = {}
 
@@ -69,40 +75,28 @@ module.exports = {
         query.levelCode = levelCode
       }
 
-      // if (
-      //   Array.isArray(censusAttribute)
-      //   || censusAttribute.length > 0
-      //   || censusAttribute.every((ele) => typeof ele === "string")
-      // ) {
-      //   query.censusAttribute = { $in: censusAttribute }
-      // } else {
-      //   return res
-      //     .status(400)
-      //     .json({
-      //       error: true,
-      //       message:
-      //         "Field 'censusAttribute' must be non empty array of string !!!",
-      //     })
-      // }
-      query.nutsId = nutsId
-      // query.censusAttribute = censusAttribute
+      if (!Array.isArray(censusAttributes)) {
+        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
+      }
 
       const upperNutsId = nutsId.toUpperCase()
-      const data = await Region.findOne({ nutsId: upperNutsId }).lean().exec()
+      const centerRegion = await Region.findOne({ nutsId: upperNutsId }).lean().exec()
 
-      if (data == null) {
+      if (centerRegion == null) {
         return res
           .status(400)
           .json({ error: true, message: "No data found !!" })
       }
       const regions = await Region.find({
+        ...query,
+        // levelCode: 3,
         centroid: {
           $nearSphere: {
             $geometry: {
               type: "Point",
               coordinates: [
-                Number(data.centroid.coordinates[0]),
-                Number(data.centroid.coordinates[1]),
+                Number(centerRegion.centroid.coordinates[0]),
+                Number(centerRegion.centroid.coordinates[1]),
               ],
             },
             $maxDistance: Number(radiusConvert.miles2meters(radius)), // convert input radius in miles to meters
@@ -112,57 +106,25 @@ module.exports = {
         .select("-_id nutsId")
         .lean()
         .exec()
-      query.nutsId = nutsId
-      const nutsIds = regions.map((x) => x.nutsId)
-      // const query = {}
+      const nutsIds = regions.map((x) => x.nutsId?.toUpperCase())
 
-      // for nutsid
-      if (nutsIds && Array.isArray(nutsIds)) {
-        query.nutsId = { $in: nutsIds }
-      } else {
-        return res.status(400).json({ error: true, message: "nutsIds must be an array" })
-      }
-      if (!Array.isArray(censusAttributes)) {
-        return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
-      }
-
-      const pipeline = [
-        {
-          $match: {
-            ...query
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            nutsId: "$nutsId",
-            name: "$name",
-            levelCode: "$levelcode",
-            geoLevelName: 1,
-            countryCode: 1,
-            ...censusAttributes.reduce((acc, attr) => {
-              acc[attr] = `$censusAttributes.${attr}`
-              return acc
-            }, {})
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            ...censusAttributes.reduce((acc, attr) => {
-              acc[attr] = { $sum: `$${attr}` }
-              return acc
-            }, {})
-
-          }
-        }
-      ]
-      // console.log("pipeline", JSON.stringify(pipeline, null, 2))
-      const [[censusData = {}], references] = await Promise.all([
-        Census.aggregate(pipeline),
+      const [censusDocs = {}, references] = await Promise.all([
+        Census.find({ nutsId: { $in: nutsIds } }).lean().exec(),
         Reference.find({ attribute: censusAttributes }).lean().exec()
       ])
-      // console.log(censusData);
+
+      // Create temporary file with census data
+      await fs.writeFile(`./tmp/${reqId}.json`, JSON.stringify(censusDocs, null, 2), "utf-8")
+
+      // Call Python script
+      const { stdout } = await execa(process.env.PYTHON_EXE_PATH, [
+        process.env.CENSUS_AGGREGATOR_SCRIPT_PATH,
+        `./tmp/${reqId}.json`
+      ])
+
+      const sanitizedOutput = stdout.replace(/NaN/g, "null") // remove NaN values (coming from Python?)
+      const censusData = JSON.parse(sanitizedOutput)
+      // console.log("censusData ==> ", Object.keys(censusData))
 
       return res.status(200).json({
         error: false,
@@ -180,6 +142,9 @@ module.exports = {
       })
     } catch (error) {
       return res.status(500).json({ error: true, message: error.message })
+    } finally {
+      // Remove temporary file
+      await rimraf(`./tmp/${reqId}.json`)
     }
-  },
+  }
 }
