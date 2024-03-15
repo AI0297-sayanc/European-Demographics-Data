@@ -5,7 +5,6 @@ const cuid = require("cuid")
 
 const Reference = require("../../../models/reference")
 const Census = require("../../../models/census")
-const Region = require("../../../models/region")
 
 module.exports = {
   async byNutsId(req, res) {
@@ -74,7 +73,7 @@ module.exports = {
 
       const sanitizedOutput = stdout.replace(/NaN/g, "null")
       const censusData = JSON.parse(sanitizedOutput)
-      console.log("censusData ==> ", censusData)
+      // console.log("censusData ==> ", censusData)
 
       return res.status(200).json({
         error: false,
@@ -82,13 +81,13 @@ module.exports = {
         censusData: censusData.map((obj) => ({
           countryCode: obj.countryCode,
           censusAttributes: censusAttributes.map((attr) => {
-            const ref = references.find((r) => r.attribute === attr);
+            const ref = references.find((r) => r.attribute === attr)
             return {
               name: ref?.name,
               attribute: attr,
               value: obj.censusAttributes[attr] || null,
               description: ref?.description
-            };
+            }
           })
         }))
       })
