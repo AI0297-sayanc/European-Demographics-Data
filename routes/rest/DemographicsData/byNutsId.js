@@ -1,104 +1,105 @@
+const execa = require("execa")
+const fs = require("fs/promises")
+const { rimraf } = require("rimraf")
+const cuid = require("cuid")
+
 const Reference = require("../../../models/reference")
 const Census = require("../../../models/census")
+const Region = require("../../../models/region")
 
 module.exports = {
-/**
- * @api {post} /demographics/nutsids Retrieve computed data from Census Data by NUTS ID
- * @apiName Retrieve computed data
- * @apiGroup Demographics Data
-
- * @apiVersion 1.0.0
- *
- * @apiParam {Array} nutsIds Array of NUTS IDs for filtering.
- * @apiParam {Array} censusAttributes Array of census attributes.
- * @apiSuccessExample { json Success-Response: 200
-  *     {
-  *       "error": false,
-  *       "censusData": [
-  *         {
-  *           "name": "Population",
-  *           "attribute": "EU_E002",
-  *           "value": 2598816,
-  *           "description": "Total Population"
-  *
-
-  *   ]
-  *
-}
-  */
   async byNutsId(req, res) {
+    const reqId = cuid() // unique identifier for the endpoint call
     try {
       const {
-        nutsIds, censusAttributes, countryCode = null, levelCode = null
+        nutsIds,
+        censusAttributes,
+        countryCode = null,
+        levelCode
       } = req.body
 
       const query = {}
 
-      // validation start....
+      // Validation start....
       if (!Array.isArray(nutsIds) || nutsIds.length === 0) {
-        return res.status(400).json({ error: true, message: "nutsIds must be an array and should not be empty" })
+        return res.status(400).json({
+          error: true,
+          message: "Field 'nutsIds' must be a non-empty array!"
+        })
       }
 
       if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
-        return res.status(400).json({ error: true, message: "censusAttributes must be an array and should not be empty" })
+        return res.status(400).json({
+          error: true,
+          message: "censusAttributes must be an array and should not be empty"
+        })
       }
 
       if (countryCode !== null) {
-        if (typeof countryCode !== "string" || countryCode.trim() === "") return res.status(400).json({ error: true, message: "Field 'countryCode' must be a valid string" })
+        if (typeof countryCode !== "string" || countryCode.trim() === "") {
+          return res.status(400).json({
+            error: true,
+            message: "Field 'countryCode' must be a valid string"
+          })
+        }
         query.countryCode = countryCode
       }
 
-      if (levelCode !== null) {
-        // eslint-disable-next-line no-restricted-globals
-        if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number" })
-        query.levelCode = levelCode
+      // eslint-disable-next-line no-restricted-globals
+      if (typeof levelCode !== "number" || isNaN(levelCode)) {
+        return res.status(400).json({
+          error: true,
+          message: "Field 'levelCode' must be a valid number!"
+        })
       }
 
-      query.nutsId = { $in: nutsIds }
+      const upperNutsIds = nutsIds.map((id) => id.toUpperCase())
+      query.nutsId = {
+        $in: upperNutsIds
+      }
 
-      const pipeline = [
-        {
-          $match: {
-            ...query
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-
-            ...censusAttributes.reduce((acc, attr) => ({ ...acc, [attr]: `$censusAttributes.${attr}` }), {})
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            ...censusAttributes.reduce((acc, attr) => ({ ...acc, [attr]: { $sum: `$${attr}` } }), {})
-          }
-        }
-      ]
-      // console.log("pipeline", JSON.stringify(pipeline, null, 2))
-      const [[censusData = {}], references] = await Promise.all([
-        Census.aggregate(pipeline),
-        Reference.find({ attribute: censusAttributes }).lean().exec()
+      const [censusDocs = {}, references] = await Promise.all([
+        Census.find(query).lean().exec(),
+        Reference.find({ attribute: { $in: censusAttributes } }).lean().exec()
       ])
+
+      // Create temporary file with census data
+      await fs.writeFile(`./tmp/${reqId}.json`, JSON.stringify(censusDocs), "utf-8")
+
+      // Call Python script
+      const { stdout } = await execa(process.env.PYTHON_EXE_PATH, [
+        process.env.CENSUS_AGGREGATOR_SCRIPT_PATH,
+        `./tmp/${reqId}.json`
+      ])
+
+      const sanitizedOutput = stdout.replace(/NaN/g, "null")
+      const censusData = JSON.parse(sanitizedOutput)
+      console.log("censusData ==> ", censusData)
 
       return res.status(200).json({
         error: false,
-        censusData: Object.keys(censusData)
-          .filter((el) => el !== "_id")
-          .map((attr) => {
-            const ref = references.find((r) => r.attribute === attr)
+        levelCode,
+        censusData: censusData.map((obj) => ({
+          countryCode: obj.countryCode,
+          censusAttributes: censusAttributes.map((attr) => {
+            const ref = references.find((r) => r.attribute === attr);
             return {
               name: ref?.name,
               attribute: attr,
-              value: censusData[attr],
+              value: obj.censusAttributes[attr] || null,
               description: ref?.description
-            }
+            };
           })
+        }))
       })
     } catch (err) {
-      // console.log("err ==> ", err)
-      return res.status(500).json({ error: true, message: err.message })
+      return res.status(500).json({
+        error: true,
+        message: err.message
+      })
+    } finally {
+      // Remove temporary file
+      await rimraf(`./tmp/${reqId}.json`)
     }
   }
 }
