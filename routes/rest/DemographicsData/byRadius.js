@@ -1,5 +1,5 @@
 const cuid = require("cuid")
-const fs = require("node:fs/promises")
+const fs = require("fs").promises
 const { rimraf } = require("rimraf")
 const execa = require("execa")
 
@@ -69,11 +69,8 @@ module.exports = {
         query.countryCode = countryCode
       }
 
-      if (levelCode !== null) {
-        // eslint-disable-next-line no-restricted-globals
-        if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number!" })
-        query.levelCode = levelCode
-      }
+      // eslint-disable-next-line no-restricted-globals
+      if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number!" })
 
       if (!Array.isArray(censusAttributes)) {
         return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
@@ -114,31 +111,34 @@ module.exports = {
       ])
 
       // Create temporary file with census data
-      await fs.writeFile(`./tmp/${reqId}.json`, JSON.stringify(censusDocs, null, 2), "utf-8")
+      await fs.writeFile(`./tmp/${reqId}.json`, JSON.stringify(censusDocs), "utf-8")
 
       // Call Python script
       const { stdout } = await execa(process.env.PYTHON_EXE_PATH, [
         process.env.CENSUS_AGGREGATOR_SCRIPT_PATH,
         `./tmp/${reqId}.json`
       ])
-
       const sanitizedOutput = stdout.replace(/NaN/g, "null") // remove NaN values (coming from Python?)
       const censusData = JSON.parse(sanitizedOutput)
-      // console.log("censusData ==> ", Object.keys(censusData))
 
       return res.status(200).json({
         error: false,
-        censusData: Object.keys(censusData)
-          .filter((el) => el !== "_id")
-          .map((attr) => {
-            const ref = references.find((r) => r.attribute === attr)
-            return {
-              name: ref?.name,
-              attribute: attr,
-              value: censusData[attr],
-              description: ref?.description
-            }
-          })
+        levelCode,
+        censusData: censusData
+          .map((obj) => ({
+            countryCode: obj.countryCode,
+            censusAttributes: Object.keys(obj.censusAttributes)
+              // .filter((attr) => obj.censusAttributes[attr] !== null)
+              .map((attr) => {
+                const ref = references.find((r) => r.attribute === attr)
+                return {
+                  name: ref?.name,
+                  attribute: attr,
+                  value: obj.censusAttributes[attr],
+                  description: ref?.description
+                }
+              })
+          }))
       })
     } catch (error) {
       return res.status(500).json({ error: true, message: error.message })
