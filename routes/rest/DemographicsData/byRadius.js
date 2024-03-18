@@ -43,7 +43,7 @@ module.exports = {
       const {
         nutsId, radius, countryCode = null, levelCode = 3, censusAttributes
       } = req.body
-      console.log("censusAttributes ==> ", censusAttributes)
+      // console.log("censusAttributes ==> ", censusAttributes)
       const query = {}
 
       // Validation....
