@@ -43,16 +43,12 @@ module.exports = {
       const {
         nutsId, radius, countryCode = null, levelCode = 3, censusAttributes
       } = req.body
+      console.log("censusAttributes ==> ", censusAttributes)
       const query = {}
 
       // Validation....
       if (typeof nutsId !== "string" || nutsId.trim() === "") {
-        return res
-          .status(400)
-          .json({
-            error: true,
-            message: "Field 'nutsId must be non empty string !!!",
-          })
+        return res.status(400).json({ error: true, message: "Field 'nutsId must be non empty string !!!" })
       }
       // eslint-disable-next-line no-restricted-globals
       if (typeof radius !== "number") {
@@ -82,7 +78,7 @@ module.exports = {
       if (centerRegion == null) {
         return res
           .status(400)
-          .json({ error: true, message: "No data found !!" })
+          .json({ error: true, message: "No centroidRegion found !!" })
       }
       const regions = await Region.find({
         ...query,
