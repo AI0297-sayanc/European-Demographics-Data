@@ -245,12 +245,13 @@ test.serial("If levelCode is null, expecting 400", async (t) => {
   t.is(response.status, 400)
 })
 
-test.serial("If levelCode is undefined, expecting 200", async (t) => {
+test.serial("If levelCode is undefined, set default to 3, and expect 200", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/radius")
     .set("Accept", "application/json")
     .send({ ...requestBody, levelCode: undefined })
   t.is(response.status, 200)
+  t.is(response.body.levelCode, 3)
 })
 
 test.serial("If levelCode is empty, expecting 400", async (t) => {
