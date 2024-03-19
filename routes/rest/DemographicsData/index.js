@@ -4,6 +4,8 @@ const express = require("express")
 const byRadius = require("./byRadius")
 const byNutsId = require("./byNutsId")
 const byGeoJson = require("./byGeoJson")
+const byAdjacent = require("./byAdjacent")
+const byLongLat = require("./byLongLat")
 
 // router
 const router = express.Router()
@@ -12,5 +14,7 @@ const router = express.Router()
 router.post("/radius", byRadius.byRadius)
 router.post("/nutsids", byNutsId.byNutsId)
 router.post("/geojson", byGeoJson.byGeojson)
+router.post("/adjacent", byAdjacent.byAdjacent)
+router.post("/longlat", byLongLat.byLongLat)
 
 module.exports = router
