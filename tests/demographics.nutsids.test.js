@@ -182,7 +182,7 @@ test.serial("If levelCode is null, expecting 400", async (t) => {
   t.is(response.status, 400)
 })
 
-test.only("If levelCode is undefined, set default to 3, and expect 200", async (t) => {
+test.serial("If levelCode is undefined, set default to 3, and expect 200", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/nutsids")
     .set("Accept", "application/json")
