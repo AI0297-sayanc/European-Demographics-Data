@@ -89,7 +89,7 @@ test.serial("If nutsId is NaN, expecting 400", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/adjacent")
     .set("Accept", "application/json")
-    .send({ ...requestBody, nutsIds: NaN })
+    .send({ ...requestBody, nutsId: NaN })
   t.is(response.status, 400)
 })
 
@@ -97,7 +97,7 @@ test.serial("If nutsId is 0, expecting 400", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/adjacent")
     .set("Accept", "application/json")
-    .send({ ...requestBody, nutsIds: 0 })
+    .send({ ...requestBody, nutsId: 0 })
   t.is(response.status, 400)
 })
 
@@ -113,15 +113,7 @@ test.serial("If nutsId is number, expecting 400", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/adjacent")
     .set("Accept", "application/json")
-    .send({ ...requestBody, nutsIds: 22 })
-  t.is(response.status, 400)
-})
-
-test.serial("If nutsId is string, expecting 400", async (t) => {
-  const response = await request(app)
-    .post("/api/v1/demographics/adjacent")
-    .set("Accept", "application/json")
-    .send({ ...requestBody, nutsIds: "DK03" })
+    .send({ ...requestBody, nutsId: 22 })
   t.is(response.status, 400)
 })
 
@@ -129,7 +121,7 @@ test.serial("If nutsId is object, expecting 400", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/adjacent")
     .set("Accept", "application/json")
-    .send({ ...requestBody, nutsIds: { key: "DK03" } })
+    .send({ ...requestBody, nutsId: { key: "DK03" } })
   t.is(response.status, 400)
 })
 
@@ -189,7 +181,7 @@ test.serial("If levelCode is null, expecting 400", async (t) => {
   t.is(response.status, 400)
 })
 
-test.only("If levelCode is undefined, set default to 3, and expect 200", async (t) => {
+test.serial("If levelCode is undefined, set default to 3, and expect 200", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/adjacent")
     .set("Accept", "application/json")

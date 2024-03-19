@@ -23,6 +23,7 @@ module.exports = {
       if (typeof nutsId !== "string" || nutsId.trim() === "") {
         return res.status(400).json({ error: true, message: "Field 'nutsId' must be a non-empty string!!!" })
       }
+
       if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
         return res.status(400).json({
           error: true,
@@ -30,7 +31,7 @@ module.exports = {
         })
       }
 
-      if (countryCode !== null) {
+      if (countryCode !== null && countryCode !== undefined) {
         if (typeof countryCode !== "string" || countryCode.trim() === "") {
           return res.status(400).json({
             error: true,
