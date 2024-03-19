@@ -33,7 +33,7 @@ module.exports = {
  *   ]
  * }
   */
-  async byGeojson(req, res) {
+  async byGeoJson(req, res) {
     const reqId = cuid() // unique identifier for the endpoint call
     try {
       const { geojson, censusAttributes } = req.body
