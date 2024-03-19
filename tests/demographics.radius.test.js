@@ -30,14 +30,24 @@ const requestBody = {
 test.serial("Validating Response Schema", async (t) => {
   const schema = Joi.object({
     error: Joi.boolean().required(),
-    censusData: Joi.array().items(
-      Joi.object({
-        name: Joi.string().required(),
-        value: Joi.number().required(),
-        attribute: Joi.string().required(),
-        description: Joi.string().required()
-      })
-    ).required()
+    levelCode: Joi.number().required(),
+    censusData: Joi.array()
+      .items(
+        Joi.object({
+          countryCode: Joi.string().required(),
+          censusAttributes: Joi.array()
+            .items(
+              Joi.object({
+                name: Joi.string(),
+                attribute: Joi.string().required(),
+                value: Joi.number().required().allow(null),
+                description: Joi.string(),
+              })
+            )
+            .required(),
+        })
+      )
+      .required(),
   })
 
   const response = await request(app)
@@ -227,20 +237,21 @@ test.serial("If countryCode is object, expecting 400", async (t) => {
   t.is(response.status, 400)
 })
 
-test.serial("If levelCode is null, expecting 200", async (t) => {
+test.serial("If levelCode is null, expecting 400", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/radius")
     .set("Accept", "application/json")
     .send({ ...requestBody, levelCode: null })
-  t.is(response.status, 200)
+  t.is(response.status, 400)
 })
 
-test.serial("If levelCode is undefined, expecting 200", async (t) => {
+test.serial("If levelCode is undefined, set default to 3, and expect 200", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/radius")
     .set("Accept", "application/json")
     .send({ ...requestBody, levelCode: undefined })
   t.is(response.status, 200)
+  t.is(response.body.levelCode, 3)
 })
 
 test.serial("If levelCode is empty, expecting 400", async (t) => {
@@ -265,7 +276,8 @@ test.serial("If levelCode is 0, expecting 200, but empty results", async (t) => 
     .set("Accept", "application/json")
     .send({ ...requestBody, levelCode: 0 })
   t.is(response.status, 200)
-  t.deepEqual(response.body.censusData, [])
+  t.true(Array.isArray(response.body.censusData))
+  t.is(response.body.censusData.length, 0)
 })
 
 test.serial("If levelCode is false, expecting 400", async (t) => {
