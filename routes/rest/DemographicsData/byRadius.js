@@ -43,6 +43,7 @@ module.exports = {
       const {
         nutsId, radius, countryCode = null, levelCode = 3, censusAttributes
       } = req.body
+
       // console.log("censusAttributes ==> ", censusAttributes)
       const query = {}
 
@@ -65,6 +66,9 @@ module.exports = {
         query.countryCode = countryCode
       }
 
+      if (levelCode === null) {
+        return res.status(400).json({ error: true, message: "Field 'levelCode' cannot be null!" })
+      }
       if (levelCode !== null) {
         // eslint-disable-next-line no-restricted-globals
         if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number!" })
@@ -85,7 +89,6 @@ module.exports = {
       }
       const regions = await Region.find({
         ...query,
-        // levelCode: 3,
         centroid: {
           $nearSphere: {
             $geometry: {
@@ -103,12 +106,13 @@ module.exports = {
         .lean()
         .exec()
       const nutsIds = regions.map((x) => x.nutsId?.toUpperCase())
+      // console.log("nutsIds ==> ", nutsIds)
 
       const [censusDocs = {}, references] = await Promise.all([
         Census.find({ nutsId: { $in: nutsIds } }).lean().exec(),
         Reference.find({ attribute: censusAttributes }).lean().exec()
       ])
-
+      // console.log("censusDocs ==> ", censusDocs)
       // Create temporary file with census data
       await fs.writeFile(`./tmp/${reqId}.json`, JSON.stringify(censusDocs), "utf-8")
 
@@ -119,6 +123,8 @@ module.exports = {
       ])
       const sanitizedOutput = stdout.replace(/NaN/g, "null") // remove NaN values (coming from Python?)
       const censusData = JSON.parse(sanitizedOutput)
+
+      // console.log("censusData ==> ", censusData)
 
       return res.status(200).json({
         error: false,
