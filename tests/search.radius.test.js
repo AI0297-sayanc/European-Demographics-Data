@@ -19,7 +19,7 @@ const requestBody = {
   levelCodes: [1, 2]
 }
 
-test.only("Validating Response Schema", async (t) => {
+test.serial("Validating Response Schema", async (t) => {
   const schema = Joi.object({
     error: Joi.boolean().required(),
     count: Joi.number().integer().min(0).required(),
