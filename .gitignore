@@ -69,3 +69,6 @@ tempCodeRunnerFile.javascript
 
 
 !public/.gitkeep
+
+tmp/*
+!tmp/.gitkeep
