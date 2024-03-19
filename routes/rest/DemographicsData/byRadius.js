@@ -100,12 +100,13 @@ module.exports = {
         .lean()
         .exec()
       const nutsIds = regions.map((x) => x.nutsId?.toUpperCase())
+      // console.log("nutsIds ==> ", nutsIds)
 
       const [censusDocs = {}, references] = await Promise.all([
         Census.find({ nutsId: { $in: nutsIds } }).lean().exec(),
         Reference.find({ attribute: censusAttributes }).lean().exec()
       ])
-
+      // console.log("censusDocs ==> ", censusDocs)
       // Create temporary file with census data
       await fs.writeFile(`./tmp/${reqId}.json`, JSON.stringify(censusDocs), "utf-8")
 
@@ -116,6 +117,8 @@ module.exports = {
       ])
       const sanitizedOutput = stdout.replace(/NaN/g, "null") // remove NaN values (coming from Python?)
       const censusData = JSON.parse(sanitizedOutput)
+
+      // console.log("censusData ==> ", censusData)
 
       return res.status(200).json({
         error: false,

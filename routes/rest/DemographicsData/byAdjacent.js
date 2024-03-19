@@ -3,15 +3,16 @@ const fs = require("fs/promises")
 const { rimraf } = require("rimraf")
 const cuid = require("cuid")
 
+const Region = require("../../../models/region")
 const Reference = require("../../../models/reference")
 const Census = require("../../../models/census")
 
 module.exports = {
-  async byNutsId(req, res) {
-    const reqId = cuid() // unique identifier for the endpoint call
+  async byAdjacent(req, res) {
+    const reqId = cuid()
     try {
       const {
-        nutsIds,
+        nutsId,
         censusAttributes,
         countryCode = null,
         levelCode
@@ -19,14 +20,9 @@ module.exports = {
 
       const query = {}
 
-      // Validation start....
-      if (!Array.isArray(nutsIds) || nutsIds.length === 0) {
-        return res.status(400).json({
-          error: true,
-          message: "Field 'nutsIds' must be a non-empty array!"
-        })
+      if (typeof nutsId !== "string" || nutsId.trim() === "") {
+        return res.status(400).json({ error: true, message: "Field 'nutsId' must be a non-empty string!!!" })
       }
-
       if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
         return res.status(400).json({
           error: true,
@@ -44,14 +40,15 @@ module.exports = {
         query.countryCode = countryCode
       }
 
-      // eslint-disable-next-line no-restricted-globals
-      if (typeof levelCode !== "number" || isNaN(levelCode)) {
-        return res.status(400).json({
-          error: true,
-          message: "Field 'levelCode' must be a valid number!"
-        })
+      // Find the center region based on nutsId
+      const centerRegion = await Region.findOne({ nutsId })
+      if (centerRegion == null) {
+        return res
+          .status(400)
+          .json({ error: true, message: "No centroidRegion found !!" })
       }
-      query.levelCode = levelCode
+
+      const nutsIds = [nutsId, ...centerRegion.adjacentRegions]
 
       const upperNutsIds = nutsIds.map((id) => id.toUpperCase())
       query.nutsId = {
