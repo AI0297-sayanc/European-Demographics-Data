@@ -1,3 +1,5 @@
+const execa = require("execa")
+const fs = require("fs/promises")
 const { rimraf } = require("rimraf")
 const cuid = require("cuid")
 
@@ -7,7 +9,7 @@ const Region = require("../../../models/region")
 
 module.exports = {
   async byLongLat(req, res) {
-    const reqId = cuid() // unique identifier for the endpoint call
+    const reqId = cuid()
     try {
       const {
         long, lat, censusAttributes, levelCode = 3
@@ -75,11 +77,25 @@ module.exports = {
           .exec(),
       ])
 
+      await fs.writeFile(
+        `./tmp/${reqId}.json`,
+        JSON.stringify(censusDocs),
+        "utf-8"
+      )
+
+      const { stdout } = await execa(process.env.PYTHON_EXE_PATH, [
+        process.env.CENSUS_AGGREGATOR_SCRIPT_PATH,
+        `./tmp/${reqId}.json`,
+      ])
+
+      const sanitizedOutput = stdout.replace(/NaN/g, "null")
+      const censusData = JSON.parse(sanitizedOutput)
+
       // Format response
       return res.status(200).json({
         error: false,
         levelCode,
-        censusData: censusDocs.map((obj) => ({
+        censusData: censusData.map((obj) => ({
           countryCode: obj.countryCode,
           censusAttributes: censusAttributes.map((attr) => {
             const ref = references.find((r) => r.attribute === attr)
