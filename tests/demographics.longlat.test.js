@@ -142,16 +142,6 @@ test.serial("Check if lat is valid", async (t) => {
   t.is(response.body.message, "Field 'lat' not valid !!!")
 })
 
-// test.serial("Check if count is less than or equal to 3", async (t) => {
-//   const response = await request(app)
-//     .post("/api/v1/demographics/longlat")
-//     .send(requestBody)
-//     .set("Accept", "application/json")
-
-//   t.is(response.status, 200)
-//   t.is(response.body.regions.length <= 3, true)
-// })
-
 test.serial("If censusAttributes is null, expecting 400", async (t) => {
   const response = await request(app)
     .post("/api/v1/demographics/longlat")
