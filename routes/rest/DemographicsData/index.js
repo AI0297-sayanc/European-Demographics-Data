@@ -3,7 +3,7 @@ const express = require("express")
 /** The Controller files */
 const byRadius = require("./byRadius")
 const byNutsId = require("./byNutsId")
-const byGeoJson = require("./byGeoJson")
+const byGeoJson = require("./byGeojson")
 const byAdjacent = require("./byAdjacent")
 
 // router

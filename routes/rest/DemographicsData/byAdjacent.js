@@ -15,7 +15,7 @@ module.exports = {
         nutsId,
         censusAttributes,
         countryCode = null,
-        levelCode
+        levelCode = 3
       } = req.body
 
       const query = {}
@@ -39,6 +39,15 @@ module.exports = {
         }
         query.countryCode = countryCode
       }
+
+      // eslint-disable-next-line no-restricted-globals
+      if (typeof levelCode !== "number" || isNaN(levelCode)) {
+        return res.status(400).json({
+          error: true,
+          message: "Field 'levelCode' must be a valid number!"
+        })
+      }
+      query.levelCode = levelCode
 
       // Find the center region based on nutsId
       const centerRegion = await Region.findOne({ nutsId })

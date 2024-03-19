@@ -56,6 +56,7 @@ test.serial("Validating Response Schema", async (t) => {
     .send(requestBody)
 
   t.is(response.status, 200, `Expected 200 OK, but got ${response.status}`)
+  t.is(requestBody.levelCode, response.body.levelCode)
 
   const { error } = schema.validate(response.body, { abortEarly: false })
   t.is(error === undefined, true, error?.message)

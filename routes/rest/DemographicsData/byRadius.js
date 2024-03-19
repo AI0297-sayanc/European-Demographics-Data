@@ -65,11 +65,14 @@ module.exports = {
         query.countryCode = countryCode
       }
 
-      if (levelCode !== null) {
-        // eslint-disable-next-line no-restricted-globals
-        if (typeof levelCode !== "number" || isNaN(levelCode)) return res.status(400).json({ error: true, message: "Field 'levelcode' must be a valid number!" })
-        query.levelCode = levelCode
+      // eslint-disable-next-line no-restricted-globals
+      if (typeof levelCode !== "number" || isNaN(levelCode)) {
+        return res.status(400).json({
+          error: true,
+          message: "Field 'levelCode' must be a valid number!"
+        })
       }
+      query.levelCode = levelCode
 
       if (!Array.isArray(censusAttributes)) {
         return res.status(400).json({ error: true, message: "censusAttributes must be an array" })
@@ -85,7 +88,6 @@ module.exports = {
       }
       const regions = await Region.find({
         ...query,
-        // levelCode: 3,
         centroid: {
           $nearSphere: {
             $geometry: {

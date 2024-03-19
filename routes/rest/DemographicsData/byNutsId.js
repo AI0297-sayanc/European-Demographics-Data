@@ -14,7 +14,7 @@ module.exports = {
         nutsIds,
         censusAttributes,
         countryCode = null,
-        levelCode
+        levelCode = 3
       } = req.body
 
       const query = {}
