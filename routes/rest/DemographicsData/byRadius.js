@@ -43,6 +43,7 @@ module.exports = {
       const {
         nutsId, radius, countryCode = null, levelCode = 3, censusAttributes
       } = req.body
+
       // console.log("censusAttributes ==> ", censusAttributes)
       const query = {}
 
@@ -63,6 +64,10 @@ module.exports = {
       if (countryCode !== null) {
         if (typeof countryCode !== "string" || countryCode.trim() === "") return res.status(400).json({ error: true, message: "Field 'countryCode' must be a valid string" })
         query.countryCode = countryCode
+      }
+
+      if (levelCode === null) {
+        return res.status(400).json({ error: true, message: "Field 'levelCode' cannot be null!" })
       }
 
       if (levelCode !== null) {
