@@ -38,7 +38,9 @@ module.exports = {
   */
   async searchAdjacent(req, res) {
     try {
-      const { nutsId, levelCode } = req.params
+      const { nutsId } = req.params
+      const { levelCode } = req.query
+
       const region = await Region.findOne({
         nutsId
       })
@@ -47,10 +49,11 @@ module.exports = {
         .exec()
       if (region === null) return res.status(400).json({ error: true, message: `No such nuts id ${nutsId}` })
 
-      const adjacentRegions = await Region.find({
-        nutsId: { $in: region.adjacentRegions },
-        levelCode
-      })
+      const query = { nutsId: { $in: region.adjacentRegions } }
+      // eslint-disable-next-line no-restricted-globals
+      if (!isNaN(levelCode)) query.levelCode = Number(levelCode) // @sayanriju
+
+      const adjacentRegions = await Region.find(query)
         .select("-_id nutsId name levelCode geoLevelName parentId countryCode")
         .lean()
         .exec()
