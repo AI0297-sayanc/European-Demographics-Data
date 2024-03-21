@@ -17,9 +17,15 @@ test.beforeEach(setupFixtures)
 test.afterEach(teardownFixtures)
 
 const requestBody = {
-  long: 15,
-  lat: 55,
-  censusAttributes: ["EU_E001", "EU_E002", "EU_E003", "EU_E004", "EU_E005"],
+  long: 14.825397676783044,
+  lat: 55.254097633301434,
+  censusAttributes: [
+    "EU_E001",
+    "EU_E002",
+    "EU_E003",
+    "EU_E004",
+    "EU_E005"
+  ],
   levelCode: 1,
 }
 
@@ -98,9 +104,7 @@ test.serial(
       .post("/api/v1/demographics/longlat")
       .set("Accept", "application/json")
       .send({ ...requestBody, levelCode: 0 })
-    t.is(response.status, 200)
-    t.true(Array.isArray(response.body.censusData))
-    t.is(response.body.censusData.length, 0)
+    t.is(response.status, 400)
   }
 )
 

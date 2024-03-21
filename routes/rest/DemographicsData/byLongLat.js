@@ -2,6 +2,7 @@ const execa = require("execa")
 const fs = require("fs/promises")
 const { rimraf } = require("rimraf")
 const cuid = require("cuid")
+const { isLongitude, isLatitude } = require("../../../lib/latLong")
 
 const Reference = require("../../../models/reference")
 const Census = require("../../../models/census")
@@ -16,18 +17,18 @@ module.exports = {
       } = req.body
 
       // Validations
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(String(long)) || long > 180 || long < -180 || long === null) {
+      if (!isLongitude(long)) {
         return res
           .status(400)
           .json({ error: true, message: "Field 'long' not valid !!!" })
       }
-      // eslint-disable-next-line no-restricted-globals
-      if (isNaN(String(lat)) || lat > 90 || lat < -90 || lat === null) {
+
+      if (!isLatitude(lat)) {
         return res
           .status(400)
           .json({ error: true, message: "Field 'lat' not valid !!!" })
       }
+
       if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
         return res
           .status(400)
@@ -47,7 +48,8 @@ module.exports = {
       }
 
       // Find central region
-      const centralRegion = await Region.find({
+      const centralRegion = await Region.findOne({
+        levelCode,
         geometry: {
           $geoIntersects: {
             $geometry: {
@@ -60,16 +62,20 @@ module.exports = {
         .select(
           "-_id nutsId name levelCode geoLevelName parentId countryCode adjacentRegions"
         )
-        .sort({ levelCode: -1 })
         .lean()
         .exec()
 
+      if (centralRegion === null) return res.status(400).json({ error: true, message: "No such region!" })
+
       // Extract region IDs including central region and adjacent regions
-      const regions = centralRegion.map((region) => region.nutsId)
+      const adjacentRegions = centralRegion.adjacentRegions.map((region) => region.nutsId)
 
       // Fetch census data for the regions
       const [censusDocs = {}, references] = await Promise.all([
-        Census.find({ nutsId: { $in: regions }, levelCode })
+        Census.find({
+          nutsId: { $in: [centralRegion.nutsId, ...adjacentRegions] },
+          levelCode
+        })
           .lean()
           .exec(),
         Reference.find({ attribute: { $in: censusAttributes } })
