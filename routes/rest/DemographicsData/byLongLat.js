@@ -20,13 +20,13 @@ module.exports = {
       if (!isLongitude(long)) {
         return res
           .status(400)
-          .json({ error: true, message: "Field 'long' not valid !!!" });
+          .json({ error: true, message: "Field 'long' not valid !!!" })
       }
 
       if (!isLatitude(lat)) {
         return res
           .status(400)
-          .json({ error: true, message: "Field 'lat' not valid !!!" });
+          .json({ error: true, message: "Field 'lat' not valid !!!" })
       }
 
       if (!Array.isArray(censusAttributes) || censusAttributes.length === 0) {
@@ -49,7 +49,7 @@ module.exports = {
 
       // Find central region
       const centralRegion = await Region.findOne({
-        levelCode: 3,
+        levelCode,
         geometry: {
           $geoIntersects: {
             $geometry: {
@@ -65,12 +65,17 @@ module.exports = {
         .lean()
         .exec()
 
+      if (centralRegion === null) return res.status(400).json({ error: true, message: "No such region!" })
+
       // Extract region IDs including central region and adjacent regions
       const adjacentRegions = centralRegion.adjacentRegions.map((region) => region.nutsId)
 
       // Fetch census data for the regions
       const [censusDocs = {}, references] = await Promise.all([
-        Census.find({ nutsId: { $in: [centralRegion.nutsId, ...adjacentRegions] }, levelCode })
+        Census.find({
+          nutsId: { $in: [centralRegion.nutsId, ...adjacentRegions] },
+          levelCode
+        })
           .lean()
           .exec(),
         Reference.find({ attribute: { $in: censusAttributes } })
