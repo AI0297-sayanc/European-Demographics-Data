@@ -9,6 +9,8 @@ const Geometry = require("./Geometry")
 const ReverseLookups = require("./ReverseLookups")
 const SearchIdentifiers = require("./SearchIdentifiers")
 
+router.use(authMiddleware)
+
 // Demographic Data routes...
 router.use("/demographics", DemographicsData)
 
