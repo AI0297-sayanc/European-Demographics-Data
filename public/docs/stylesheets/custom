@@ -1,0 +1,5 @@
+.content aside.warning,
+.content aside.success {
+  background-color: transparent;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black; }
